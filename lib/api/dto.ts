@@ -2,15 +2,18 @@
 
 export type GoRestaurant = {
   id: string;
-  slug: string;
   owner_id: string;
   name: string;
   description?: string;
   logo_url?: string;
   phone?: string;
   email?: string;
-  address?: string;
+  formatted_address?: string;
+  latitude: number;
+  longitude: number;
+  place_id?: string;
   timezone?: string;
+  address?: string; // legacy
   delivery_fee: number;
   min_order_amount: number;
   estimated_pickup_time: number;
@@ -18,6 +21,7 @@ export type GoRestaurant = {
   currency: string;
   opening_hours: Record<string, { open: string; close: string; closed: boolean }>;
   manual_closed: boolean;
+  onboarding_completed_steps: string[];
   created_at: string;
   updated_at: string;
 };
@@ -102,7 +106,6 @@ export type GoUser = {
 
 export type GoMembership = {
   restaurant_id: string;
-  restaurant_slug: string;
   restaurant_name: string;
   role: 'owner' | 'admin' | 'staff';
 };
@@ -117,7 +120,6 @@ export type GoAuthResponse = {
 
 export type GoFinalizeResult = {
   restaurant_id: string;
-  restaurant_slug: string;
   token: string;
   role: string;
 };

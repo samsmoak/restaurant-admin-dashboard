@@ -29,18 +29,39 @@ export const authApi = {
 };
 
 export const restaurantsApi = {
-  create: (input: { slug: string; name: string; description?: string; phone?: string; email?: string; address?: string }) =>
+  create: (input: { name: string; description?: string; phone?: string; email?: string }) =>
     api.post<GoRestaurant>('/api/restaurants', input),
   listMine: () => api.get<{ restaurants: GoRestaurant[] }>('/api/restaurants/mine'),
-  lookupBySlug: (slug: string) =>
-    api.get<GoRestaurant>(`/api/restaurants/lookup?slug=${encodeURIComponent(slug)}`, { anonymous: true }),
+  getById: (id: string) =>
+    api.get<GoRestaurant>(`/api/restaurants/${encodeURIComponent(id)}`, { anonymous: true }),
 };
+
+export type SettingsPatch = Partial<{
+  name: string;
+  logo_url: string;
+  phone: string;
+  formatted_address: string;
+  latitude: number;
+  longitude: number;
+  place_id: string;
+  timezone: string;
+  delivery_fee: number;
+  min_order_amount: number;
+  estimated_pickup_time: number;
+  estimated_delivery_time: number;
+  currency: string;
+  opening_hours: Record<string, { open: string; close: string; closed: boolean }>;
+  manual_closed: boolean;
+  completed_step: string;
+}>;
 
 export const adminRestaurantApi = {
   get: () => api.get<GoRestaurant>('/api/admin/restaurant'),
-  update: (body: unknown) => api.put<GoRestaurant>('/api/admin/restaurant', body),
+  update: (body: SettingsPatch) => api.put<GoRestaurant>('/api/admin/restaurant', body),
   toggleManualClosed: (closed: boolean) =>
     api.post<GoRestaurant>('/api/admin/restaurant/manual-closed', { closed }),
+  markStepComplete: (step: string) =>
+    api.post<GoRestaurant>('/api/admin/restaurant/onboarding/complete-step', { step }),
 };
 
 export const categoriesApi = {

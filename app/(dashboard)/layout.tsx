@@ -12,7 +12,7 @@ import {
   X,
   UserPlus,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { STUDIO_HOME, studioPath } from "@/lib/studio";
 import { useStudioStore } from "@/lib/stores/studio.store";
@@ -39,7 +39,6 @@ export default function StudioAppLayout({
   const sidebarOpen = useStudioStore((s) => s.sidebarOpen);
   const setSidebarOpen = useStudioStore((s) => s.setSidebarOpen);
 
-  const hydrate = useAuthStore((s) => s.hydrate);
   const token = useAuthStore((s) => s.token);
   const activeRestaurantId = useAuthStore((s) => s.activeRestaurantId);
   const signout = useAuthStore((s) => s.signout);
@@ -47,22 +46,31 @@ export default function StudioAppLayout({
   const restaurant = useRestaurantStore((s) => s.restaurant);
   const fetchRestaurant = useRestaurantStore((s) => s.fetch);
 
+  // Gate every routing decision on persist-rehydration actually finishing,
+  // otherwise we race-push the user to /login before zustand loads the token
+  // from localStorage.
+  const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+    const p = useAuthStore.persist.rehydrate();
+    if (p && typeof p.then === "function") {
+      p.then(() => setHydrated(true));
+    } else {
+      setHydrated(true);
+    }
+  }, []);
 
   useEffect(() => {
+    if (!hydrated) return;
     if (!token) {
       router.push("/login");
       return;
     }
     if (!activeRestaurantId) {
-      // token has no restaurant scope — send to picker / onboard
       router.push("/onboard");
       return;
     }
     if (!restaurant) void fetchRestaurant();
-  }, [token, activeRestaurantId, restaurant, fetchRestaurant, router]);
+  }, [hydrated, token, activeRestaurantId, restaurant, fetchRestaurant, router]);
 
   const handleSignOut = async () => {
     await signout();

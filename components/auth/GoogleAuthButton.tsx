@@ -15,22 +15,22 @@ import { isApiError } from "@/lib/api/client";
 type Props = { next: string; label?: string };
 type GISCredentialResponse = { credential: string };
 
-type GISGoogle = {
-  accounts: {
-    id: {
-      initialize: (opts: {
-        client_id: string;
-        callback: (r: GISCredentialResponse) => void;
-      }) => void;
-      renderButton: (el: HTMLElement, opts: Record<string, unknown>) => void;
-      prompt: () => void;
-    };
-  };
+// The Google Identity Services library attaches `google.accounts` to window.
+// We avoid declaring a module-level `google` global here because @types/google.maps
+// (pulled in by @react-google-maps/api) already owns that identifier.
+type GISAccountsId = {
+  initialize: (opts: {
+    client_id: string;
+    callback: (r: GISCredentialResponse) => void;
+  }) => void;
+  renderButton: (el: HTMLElement, opts: Record<string, unknown>) => void;
+  prompt: () => void;
 };
 
-declare global {
-  // eslint-disable-next-line no-var
-  var google: GISGoogle | undefined;
+function getGISAccounts(): GISAccountsId | null {
+  if (typeof window === "undefined") return null;
+  const g = (window as unknown as { google?: { accounts?: { id?: GISAccountsId } } }).google;
+  return g?.accounts?.id ?? null;
 }
 
 export default function GoogleAuthButton({ next, label }: Props) {
@@ -44,10 +44,10 @@ export default function GoogleAuthButton({ next, label }: Props) {
 
   useEffect(() => {
     if (!clientId || !ready) return;
-    const g = globalThis.google;
-    if (!g) return;
+    const gisId = getGISAccounts();
+    if (!gisId) return;
 
-    g.accounts.id.initialize({
+    gisId.initialize({
       client_id: clientId,
       callback: async (resp: GISCredentialResponse) => {
         if (!resp?.credential) return;
@@ -72,7 +72,7 @@ export default function GoogleAuthButton({ next, label }: Props) {
     });
 
     if (buttonRef.current) {
-      g.accounts.id.renderButton(buttonRef.current, {
+      gisId.renderButton(buttonRef.current, {
         theme: "outline",
         size: "large",
         type: "standard",

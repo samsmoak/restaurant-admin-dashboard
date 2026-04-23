@@ -18,11 +18,11 @@ type AuthState = {
   user: GoUser | null;
   memberships: GoMembership[];
   activeRestaurantId: string | null;
-  activeRestaurantSlug: string | null;
   activeRole: string | null;
   loading: boolean;
   error: string | null;
 
+  signup: (input: { full_name: string; email: string; phone: string; password: string }) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   signInWithGoogle: (id_token: string) => Promise<void>;
   finalize: (invite_code: string) => Promise<GoFinalizeResult>;
@@ -49,10 +49,20 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       memberships: [],
       activeRestaurantId: null,
-      activeRestaurantSlug: null,
       activeRole: null,
       loading: false,
       error: null,
+
+      async signup(input) {
+        set({ loading: true, error: null });
+        try {
+          const resp = await authApi.signupCustomer(input);
+          applyBase(set, resp);
+        } catch (e) {
+          set({ loading: false, error: isApiError(e) ? e.error : 'signup failed' });
+          throw e;
+        }
+      },
 
       async login(email, password) {
         set({ loading: true, error: null });
@@ -90,7 +100,6 @@ export const useAuthStore = create<AuthState>()(
           set({
             token: result.token,
             activeRestaurantId: result.restaurant_id,
-            activeRestaurantSlug: result.restaurant_slug,
             activeRole: result.role,
             loading: false,
           });
@@ -112,7 +121,6 @@ export const useAuthStore = create<AuthState>()(
             user: resp.user,
             memberships: resp.memberships,
             activeRestaurantId: restaurant_id,
-            activeRestaurantSlug: m?.restaurant_slug ?? null,
             activeRole: m?.role ?? null,
             loading: false,
           });
@@ -134,25 +142,25 @@ export const useAuthStore = create<AuthState>()(
           user: null,
           memberships: [],
           activeRestaurantId: null,
-          activeRestaurantSlug: null,
           activeRole: null,
         });
       },
 
       hydrate() {
-        const tok = getStoredToken();
-        if (tok) set({ token: tok });
+        // Trigger zustand-persist rehydration after mount (skipHydration: true
+        // means SSR starts with default state; we catch up on the client).
+        void useAuthStore.persist.rehydrate();
       },
     }),
     {
       name: 'rs-admin-auth',
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? window.localStorage : undefined) as Storage),
+      skipHydration: true,
       partialize: (s) => ({
         token: s.token,
         user: s.user,
         memberships: s.memberships,
         activeRestaurantId: s.activeRestaurantId,
-        activeRestaurantSlug: s.activeRestaurantSlug,
         activeRole: s.activeRole,
       }),
     }

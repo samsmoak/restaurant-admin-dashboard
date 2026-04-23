@@ -1,10 +1,16 @@
 'use client';
 
 /**
- * Uploads helper store. Exposes two functions:
- *   - `presignAndPut(prefix, file)` → gets a presigned URL and does the PUT
- *     from the browser. Returns the public URL for storing in a form.
- *   - `direct(prefix, file)` → uploads via the Go backend (server-side).
+ * Uploads helper store.
+ *
+ * Upload transport is the Go backend's multipart proxy endpoint
+ * (`POST /api/admin/uploads/direct`). The browser only talks to our own API,
+ * so no S3 bucket CORS is required — the Go server uploads to S3 on the
+ * backend side using IAM credentials already stored in Secret Manager.
+ *
+ * `presignAndPut` is kept as the public entry point so existing callers
+ * (SettingsForm, ItemFormDialog, StepBranding) don't need to change; it
+ * just delegates to the direct path.
  */
 
 import { create } from 'zustand';
@@ -18,42 +24,27 @@ type UploadsState = {
   direct: (prefix: 'logos' | 'menu-images', file: File) => Promise<string | null>;
 };
 
+async function uploadViaBackend(
+  set: (p: Partial<UploadsState>) => void,
+  prefix: 'logos' | 'menu-images',
+  file: File
+): Promise<string | null> {
+  set({ uploading: true, error: null });
+  try {
+    const { public_url } = await uploadsApi.direct(prefix, file);
+    set({ uploading: false });
+    return public_url;
+  } catch (e) {
+    set({ uploading: false, error: isApiError(e) ? e.error : 'upload failed' });
+    return null;
+  }
+}
+
 export const useUploadsStore = create<UploadsState>((set) => ({
   uploading: false,
   error: null,
 
-  async presignAndPut(prefix, file) {
-    set({ uploading: true, error: null });
-    try {
-      const { upload_url, public_url } = await uploadsApi.presign({
-        prefix,
-        filename: file.name,
-        content_type: file.type || 'application/octet-stream',
-        size: file.size,
-      });
-      const res = await fetch(upload_url, {
-        method: 'PUT',
-        headers: { 'Content-Type': file.type || 'application/octet-stream' },
-        body: file,
-      });
-      if (!res.ok) throw { status: res.status, error: `upload failed (${res.status})` };
-      set({ uploading: false });
-      return public_url;
-    } catch (e) {
-      set({ uploading: false, error: isApiError(e) ? e.error : 'upload failed' });
-      return null;
-    }
-  },
-
-  async direct(prefix, file) {
-    set({ uploading: true, error: null });
-    try {
-      const { public_url } = await uploadsApi.direct(prefix, file);
-      set({ uploading: false });
-      return public_url;
-    } catch (e) {
-      set({ uploading: false, error: isApiError(e) ? e.error : 'upload failed' });
-      return null;
-    }
-  },
+  // Delegates to the direct path — no browser→S3 hop, no CORS.
+  presignAndPut: (prefix, file) => uploadViaBackend(set, prefix, file),
+  direct: (prefix, file) => uploadViaBackend(set, prefix, file),
 }));
