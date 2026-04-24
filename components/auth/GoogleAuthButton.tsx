@@ -76,9 +76,10 @@ export default function GoogleAuthButton({ next, label }: Props) {
         theme: "outline",
         size: "large",
         type: "standard",
-        shape: "pill",
+        shape: "rectangular",
         text: label === "Sign up with Google" ? "signup_with" : "continue_with",
         logo_alignment: "left",
+        width: buttonRef.current.offsetWidth || 320,
       });
     }
   }, [clientId, ready, label, next, router, signIn]);
@@ -89,11 +90,11 @@ export default function GoogleAuthButton({ next, label }: Props) {
         type="button"
         disabled
         title="NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID is not set"
-        className="w-full py-3 rounded-full font-semibold text-sm opacity-60 cursor-not-allowed"
+        className="w-full py-3 font-semibold text-sm opacity-60 cursor-not-allowed"
         style={{
           backgroundColor: "#FFFFFF",
-          color: "#1A1A1A",
-          border: "1.5px solid #ECECEC",
+          color: "#1E1E1E",
+          border: "1px solid #E5E7EB",
         }}
       >
         Google sign-in not configured
@@ -110,11 +111,11 @@ export default function GoogleAuthButton({ next, label }: Props) {
       />
       {error && (
         <div
-          className="text-sm px-4 py-2.5 rounded-lg"
+          className="text-sm px-4 py-2.5"
           style={{
-            backgroundColor: "rgba(220, 38, 38, 0.08)",
-            color: "#B91C1C",
-            border: "1px solid rgba(220, 38, 38, 0.25)",
+            backgroundColor: "#FEF2F2",
+            color: "#DC2626",
+            border: "1px solid #DC2626",
           }}
         >
           {error}

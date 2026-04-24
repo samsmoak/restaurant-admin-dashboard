@@ -125,7 +125,7 @@ export default function HistoryView({
               className="px-3 py-1.5 rounded-md text-xs font-semibold transition-all"
               style={{
                 backgroundColor: range === r.key ? "#FFFFFF" : "transparent",
-                color: range === r.key ? "#0F172A" : "#64748B",
+                color: range === r.key ? "#1E1E1E" : "#4A4A4A",
                 boxShadow:
                   range === r.key
                     ? "0 1px 2px rgba(15,23,42,0.06)"
@@ -148,7 +148,7 @@ export default function HistoryView({
           <Search
             size={14}
             className="absolute left-3 top-1/2 -translate-y-1/2"
-            style={{ color: "#94A3B8" }}
+            style={{ color: "#6B7280" }}
           />
           <Input
             value={search}
@@ -161,7 +161,7 @@ export default function HistoryView({
           value={status}
           onChange={(e) => setStatus(e.target.value as OrderStatus | "all")}
           className="h-9 px-3 text-sm rounded-md"
-          style={{ border: "1px solid #E2E8F0", color: "#0F172A" }}
+          style={{ border: "1px solid #E5E7EB", color: "#1E1E1E" }}
         >
           {STATUS_OPTIONS.map((s) => (
             <option key={s.key} value={s.key}>
@@ -173,7 +173,7 @@ export default function HistoryView({
           value={orderType}
           onChange={(e) => setOrderType(e.target.value as OrderType | "all")}
           className="h-9 px-3 text-sm rounded-md"
-          style={{ border: "1px solid #E2E8F0", color: "#0F172A" }}
+          style={{ border: "1px solid #E5E7EB", color: "#1E1E1E" }}
         >
           <option value="all">All types</option>
           <option value="pickup">Pickup</option>
@@ -184,16 +184,16 @@ export default function HistoryView({
       {/* Table */}
       <div
         className="rounded-lg overflow-hidden"
-        style={{ border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF" }}
+        style={{ border: "1px solid #E5E7EB", backgroundColor: "#FFFFFF" }}
       >
         {filtered.length === 0 ? (
           <div className="px-6 py-16 text-center">
             <FileText
               size={24}
               className="mx-auto mb-2"
-              style={{ color: "#CBD5E1" }}
+              style={{ color: "#6B7280" }}
             />
-            <p className="text-sm" style={{ color: "#64748B" }}>
+            <p className="text-sm" style={{ color: "#4A4A4A" }}>
               No orders match this filter.
             </p>
           </div>
@@ -202,7 +202,7 @@ export default function HistoryView({
             <thead>
               <tr
                 className="text-left text-xs uppercase tracking-wider"
-                style={{ backgroundColor: "#F8FAFC", color: "#64748B" }}
+                style={{ backgroundColor: "#F5F7FA", color: "#4A4A4A" }}
               >
                 <Th>Order #</Th>
                 <Th>Time</Th>
@@ -232,7 +232,7 @@ export default function HistoryView({
                       </span>
                     </Td>
                     <Td>
-                      <span style={{ color: "#64748B" }}>
+                      <span style={{ color: "#4A4A4A" }}>
                         {format(new Date(o.created_at), "MMM d, h:mm a")}
                       </span>
                     </Td>
@@ -241,7 +241,7 @@ export default function HistoryView({
                         <p className="truncate">{o.customer_name}</p>
                         <p
                           className="text-xs truncate"
-                          style={{ color: "#94A3B8" }}
+                          style={{ color: "#6B7280" }}
                         >
                           {o.customer_phone}
                         </p>
@@ -307,7 +307,7 @@ function Td({
   return (
     <td
       className="px-4 py-3"
-      style={{ textAlign: align, color: "#0F172A" }}
+      style={{ textAlign: align, color: "#1E1E1E" }}
     >
       {children}
     </td>

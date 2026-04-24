@@ -1,26 +1,36 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   ClipboardList,
   FolderOpen,
   UtensilsCrossed,
   BarChart3,
   Settings,
-  LogOut,
   Menu,
   X,
   UserPlus,
+  ChevronUp,
+  LogOut,
+  type LucideIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { STUDIO_HOME, studioPath } from "@/lib/studio";
 import { useStudioStore } from "@/lib/stores/studio.store";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import { useRestaurantStore } from "@/lib/stores/restaurant.store";
+import FullScreenLoader from "@/app/_components/FullScreenLoader";
 import OpenClosedToggle from "./_components/OpenClosedToggle";
 
-const NAV_ITEMS = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  exact?: boolean;
+};
+
+const NAV_ITEMS: NavItem[] = [
   { href: STUDIO_HOME, label: "Live Orders", icon: ClipboardList, exact: true },
   { href: studioPath("history"), label: "Order History", icon: FolderOpen },
   { href: studioPath("menu"), label: "Menu Management", icon: UtensilsCrossed },
@@ -41,22 +51,18 @@ export default function StudioAppLayout({
 
   const token = useAuthStore((s) => s.token);
   const activeRestaurantId = useAuthStore((s) => s.activeRestaurantId);
+  const activeRole = useAuthStore((s) => s.activeRole);
+  const user = useAuthStore((s) => s.user);
   const signout = useAuthStore((s) => s.signout);
 
   const restaurant = useRestaurantStore((s) => s.restaurant);
   const fetchRestaurant = useRestaurantStore((s) => s.fetch);
 
-  // Gate every routing decision on persist-rehydration actually finishing,
-  // otherwise we race-push the user to /login before zustand loads the token
-  // from localStorage.
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
-    const p = useAuthStore.persist.rehydrate();
-    if (p && typeof p.then === "function") {
-      p.then(() => setHydrated(true));
-    } else {
-      setHydrated(true);
-    }
+    Promise.resolve(useAuthStore.persist.rehydrate()).then(() =>
+      setHydrated(true)
+    );
   }, []);
 
   useEffect(() => {
@@ -77,81 +83,40 @@ export default function StudioAppLayout({
     router.push("/login");
   };
 
-  const isActive = (href: string, exact?: boolean) => {
-    if (exact) return pathname === href;
-    return pathname.startsWith(href);
+  const handleSettings = () => {
+    router.push(studioPath("settings"));
+    setSidebarOpen(false);
   };
 
-  const SidebarContent = () => (
-    <>
-      <div className="px-6 py-6 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold"
-            style={{ backgroundColor: "#E8A045", color: "#111318" }}
-          >
-            E&F
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-white">Ember & Forge</p>
-            <p className="text-xs" style={{ color: "#64748B" }}>
-              Studio
-            </p>
-          </div>
-        </div>
-      </div>
+  if (!hydrated || !token || !activeRestaurantId) {
+    return <FullScreenLoader />;
+  }
 
-      {restaurant && <OpenClosedToggle variant="sidebar" />}
-
-      <nav className="flex-1 px-3 py-2 space-y-1">
-        {NAV_ITEMS.map((item) => {
-          const active = isActive(item.href, item.exact);
-          return (
-            <a
-              key={item.href}
-              href={item.href}
-              onClick={() => setSidebarOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all"
-              style={{
-                backgroundColor: active
-                  ? "rgba(232, 160, 69, 0.1)"
-                  : "transparent",
-                color: active ? "#E8A045" : "#94A3B8",
-                borderLeft: active
-                  ? "3px solid #E8A045"
-                  : "3px solid transparent",
-              }}
-            >
-              <item.icon size={18} />
-              <span>{item.label}</span>
-            </a>
-          );
-        })}
-      </nav>
-
-      <div className="px-3 py-4 border-t border-white/10">
-        <button
-          onClick={handleSignOut}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm w-full transition-all hover:bg-white/5"
-          style={{ color: "#94A3B8" }}
-        >
-          <LogOut size={18} />
-          <span>Sign Out</span>
-        </button>
-      </div>
-    </>
-  );
+  const isActive = (href: string, exact?: boolean) =>
+    exact ? pathname === href : pathname.startsWith(href);
 
   const currentPage = NAV_ITEMS.find((item) => isActive(item.href, item.exact));
   const pageTitle = currentPage?.label ?? "Studio";
 
   return (
-    <div className="flex min-h-screen">
+    <div
+      className="flex min-h-screen"
+      style={{ backgroundColor: "#F5F7FA" }}
+    >
       <aside
         className="hidden lg:flex flex-col fixed top-0 left-0 h-screen w-60 z-40"
-        style={{ backgroundColor: "#111318" }}
+        style={{ backgroundColor: "#0F2B4D" }}
       >
-        <SidebarContent />
+        <SidebarContent
+          pathname={pathname}
+          restaurantName={restaurant?.name}
+          showRestaurantToggle={!!restaurant}
+          onNavigate={() => setSidebarOpen(false)}
+          user={user}
+          role={activeRole}
+          onSignOut={handleSignOut}
+          onSettings={handleSettings}
+        />
       </aside>
 
       {sidebarOpen && (
@@ -162,7 +127,7 @@ export default function StudioAppLayout({
           <div className="absolute inset-0 bg-black/50" />
           <aside
             className="absolute top-0 left-0 h-full w-60 flex flex-col"
-            style={{ backgroundColor: "#111318" }}
+            style={{ backgroundColor: "#0F2B4D" }}
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -171,28 +136,36 @@ export default function StudioAppLayout({
             >
               <X size={20} />
             </button>
-            <SidebarContent />
+            <SidebarContent
+              pathname={pathname}
+              showRestaurantToggle={!!restaurant}
+              onNavigate={() => setSidebarOpen(false)}
+              user={user}
+              role={activeRole}
+              onSignOut={handleSignOut}
+              onSettings={handleSettings}
+            />
           </aside>
         </div>
       )}
 
       <div className="flex-1 lg:ml-60">
         <header
-          className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 border-b"
+          className="sticky top-0 z-30 flex items-center justify-between px-6 py-4"
           style={{
             backgroundColor: "#FFFFFF",
-            borderColor: "#E2E8F0",
+            borderBottom: "1px solid #111111",
           }}
         >
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden"
-              style={{ color: "#0F172A" }}
+              style={{ color: "#1E1E1E" }}
             >
               <Menu size={22} />
             </button>
-            <h1 className="text-lg font-semibold" style={{ color: "#0F172A" }}>
+            <h1 className="text-lg font-semibold" style={{ color: "#1E1E1E" }}>
               {pageTitle}
             </h1>
           </div>
@@ -200,6 +173,208 @@ export default function StudioAppLayout({
 
         <main className="p-6">{children}</main>
       </div>
+    </div>
+  );
+}
+
+function SidebarContent({
+  pathname,
+  restaurantName,
+  showRestaurantToggle,
+  onNavigate,
+  user,
+  role,
+  onSignOut,
+  onSettings,
+}: {
+  pathname: string;
+  restaurantName?: string;
+  showRestaurantToggle: boolean;
+  onNavigate: () => void;
+  user: { full_name?: string; email?: string } | null;
+  role: string | null;
+  onSignOut: () => void;
+  onSettings: () => void;
+}) {
+  const isActive = (href: string, exact?: boolean) =>
+    exact ? pathname === href : pathname.startsWith(href);
+
+  return (
+    <>
+      <div
+        className="px-6 py-6"
+        style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-9 h-9 flex items-center justify-center text-sm font-bold"
+            style={{ backgroundColor: "#FFFFFF", color: "#0F2B4D" }}
+          >
+            R
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-white truncate">Restoro</p>
+            <p
+              className="text-xs truncate"
+              style={{ color: "rgba(255, 255, 255, 0.6)" }}
+              title={restaurantName ?? undefined}
+            >
+              {restaurantName ?? "Studio"}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {showRestaurantToggle && <OpenClosedToggle variant="sidebar" />}
+
+      <nav className="flex-1 px-3 py-2 space-y-1">
+        {NAV_ITEMS.map((item) => {
+          const active = isActive(item.href, item.exact);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              prefetch
+              className="flex items-center gap-3 px-3 py-2.5 text-sm transition-all"
+              style={{
+                backgroundColor: active
+                  ? "rgba(255, 255, 255, 0.08)"
+                  : "transparent",
+                color: active ? "#FFFFFF" : "rgba(255, 255, 255, 0.6)",
+                borderLeft: active
+                  ? "3px solid #FFFFFF"
+                  : "3px solid transparent",
+              }}
+            >
+              <item.icon size={18} />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      <ProfileChip
+        user={user}
+        role={role}
+        onSignOut={onSignOut}
+        onSettings={onSettings}
+      />
+    </>
+  );
+}
+
+function ProfileChip({
+  user,
+  role,
+  onSignOut,
+  onSettings,
+}: {
+  user: { full_name?: string; email?: string } | null;
+  role: string | null;
+  onSignOut: () => void;
+  onSettings: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const displayName = user?.full_name?.trim() || user?.email || "Account";
+  const initial = (displayName[0] ?? "A").toUpperCase();
+  const subtitle = role ? role.charAt(0).toUpperCase() + role.slice(1) : user?.email ?? "";
+
+  useEffect(() => {
+    if (!open) return;
+    const onClickAway = (e: MouseEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onClickAway);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onClickAway);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [open]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative px-3 py-3"
+      style={{ borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}
+    >
+      {open && (
+        <div
+          className="absolute left-3 right-3 bottom-full mb-2"
+          style={{
+            backgroundColor: "#FFFFFF",
+            border: "1px solid #E5E7EB",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              onSettings();
+            }}
+            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-left transition-colors hover:bg-slate-50"
+            style={{ color: "#1E1E1E" }}
+          >
+            <Settings size={14} />
+            Account settings
+          </button>
+          <div style={{ borderTop: "1px solid #E5E7EB" }} />
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              onSignOut();
+            }}
+            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-left transition-colors hover:bg-slate-50"
+            style={{ color: "#DC2626" }}
+          >
+            <LogOut size={14} />
+            Sign out
+          </button>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="w-full flex items-center gap-3 px-2 py-2 transition-colors hover:bg-white/5"
+      >
+        <div
+          className="w-9 h-9 flex items-center justify-center text-sm font-bold shrink-0"
+          style={{ backgroundColor: "#FFFFFF", color: "#0F2B4D" }}
+        >
+          {initial}
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          <p className="text-sm font-semibold text-white truncate">
+            {displayName}
+          </p>
+          {subtitle && (
+            <p
+              className="text-xs truncate"
+              style={{ color: "rgba(255, 255, 255, 0.6)" }}
+            >
+              {subtitle}
+            </p>
+          )}
+        </div>
+        <ChevronUp
+          size={16}
+          style={{
+            color: "rgba(255, 255, 255, 0.6)",
+            transform: open ? "rotate(0deg)" : "rotate(180deg)",
+            transition: "transform 0.15s",
+          }}
+        />
+      </button>
     </div>
   );
 }

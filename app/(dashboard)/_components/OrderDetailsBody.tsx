@@ -20,7 +20,7 @@ export function StatusBadge({ status }: { status: OrderStatus }) {
   const c = STATUS_COLORS[status];
   return (
     <span
-      className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide"
+      className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-none uppercase tracking-wide"
       style={{ backgroundColor: c.bg, color: c.fg }}
     >
       {status}
@@ -60,13 +60,13 @@ export default function OrderDetailsBody({
         <div className="min-w-0">
           <p
             className="font-mono text-sm font-bold tracking-tight"
-            style={{ color: "#0F172A" }}
+            style={{ color: "#1E1E1E" }}
           >
             {order.order_number}
           </p>
           <div
             className="flex items-center gap-1.5 text-xs mt-0.5"
-            style={{ color: "#64748B" }}
+            style={{ color: "#4A4A4A" }}
           >
             <Clock size={11} />
             <span>
@@ -82,21 +82,21 @@ export default function OrderDetailsBody({
       {/* Customer */}
       <div
         className="rounded-lg p-3 space-y-1.5"
-        style={{ backgroundColor: "#F8FAFC" }}
+        style={{ backgroundColor: "#F5F7FA" }}
       >
-        <p className="text-sm font-semibold" style={{ color: "#0F172A" }}>
+        <p className="text-sm font-semibold" style={{ color: "#1E1E1E" }}>
           {order.customer_name}
         </p>
         <div
           className="flex items-center gap-1.5 text-xs"
-          style={{ color: "#64748B" }}
+          style={{ color: "#4A4A4A" }}
         >
           <Phone size={11} />
           <span>{order.customer_phone}</span>
         </div>
         <div className="flex items-center gap-2 pt-1">
           <span
-            className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
+            className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-none"
             style={{
               backgroundColor:
                 order.order_type === "delivery" ? "#EFF6FF" : "#F0FDF4",
@@ -112,7 +112,7 @@ export default function OrderDetailsBody({
           </span>
           {order.payment_status === "paid" && (
             <span
-              className="text-xs font-medium px-2 py-0.5 rounded-full"
+              className="text-xs font-medium px-2 py-0.5 rounded-none"
               style={{ backgroundColor: "#F0FDF4", color: "#166534" }}
             >
               Paid
@@ -122,7 +122,7 @@ export default function OrderDetailsBody({
         {order.order_type === "delivery" && order.delivery_address && (
           <div
             className="flex items-start gap-1.5 text-xs pt-1"
-            style={{ color: "#64748B" }}
+            style={{ color: "#4A4A4A" }}
           >
             <MapPin size={11} className="mt-0.5 shrink-0" />
             <span>{order.delivery_address}</span>
@@ -134,7 +134,7 @@ export default function OrderDetailsBody({
       <div>
         <p
           className="text-xs font-semibold uppercase tracking-wider mb-1.5"
-          style={{ color: "#94A3B8" }}
+          style={{ color: "#6B7280" }}
         >
           {itemCount} item{itemCount === 1 ? "" : "s"}
         </p>
@@ -145,14 +145,14 @@ export default function OrderDetailsBody({
               className="flex items-start justify-between gap-2 text-sm"
             >
               <div className="min-w-0">
-                <p style={{ color: "#0F172A" }}>
+                <p style={{ color: "#1E1E1E" }}>
                   <span className="font-semibold">{it.quantity}×</span> {it.name}
                   {it.selected_size ? ` (${it.selected_size.name})` : ""}
                 </p>
                 {it.selected_extras && it.selected_extras.length > 0 && (
                   <p
                     className="text-xs"
-                    style={{ color: "#64748B" }}
+                    style={{ color: "#4A4A4A" }}
                   >
                     + {it.selected_extras.map((e) => e.name).join(", ")}
                   </p>
@@ -160,7 +160,7 @@ export default function OrderDetailsBody({
                 {it.special_instructions && (
                   <p
                     className="text-xs italic"
-                    style={{ color: "#94A3B8" }}
+                    style={{ color: "#6B7280" }}
                   >
                     “{it.special_instructions}”
                   </p>
@@ -168,7 +168,7 @@ export default function OrderDetailsBody({
               </div>
               <span
                 className="text-sm tabular-nums shrink-0"
-                style={{ color: "#0F172A" }}
+                style={{ color: "#1E1E1E" }}
               >
                 {formatMoney(it.item_total, currency)}
               </span>
@@ -181,11 +181,11 @@ export default function OrderDetailsBody({
       {!compact && (
         <div
           className="pt-2 space-y-1 text-sm"
-          style={{ borderTop: "1px solid #E2E8F0" }}
+          style={{ borderTop: "1px solid #E5E7EB" }}
         >
           <div
             className="flex justify-between"
-            style={{ color: "#64748B" }}
+            style={{ color: "#4A4A4A" }}
           >
             <span>Subtotal</span>
             <span>{formatMoney(order.subtotal, currency)}</span>
@@ -193,7 +193,7 @@ export default function OrderDetailsBody({
           {order.delivery_fee > 0 && (
             <div
               className="flex justify-between"
-              style={{ color: "#64748B" }}
+              style={{ color: "#4A4A4A" }}
             >
               <span>Delivery fee</span>
               <span>{formatMoney(order.delivery_fee, currency)}</span>
@@ -201,7 +201,7 @@ export default function OrderDetailsBody({
           )}
           <div
             className="flex justify-between font-bold pt-1"
-            style={{ color: "#0F172A" }}
+            style={{ color: "#1E1E1E" }}
           >
             <span>Total</span>
             <span>{formatMoney(order.total, currency)}</span>

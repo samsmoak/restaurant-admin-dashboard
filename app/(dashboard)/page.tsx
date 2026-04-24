@@ -107,7 +107,7 @@ export default function LiveOrdersPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <p className="text-sm" style={{ color: "#64748B" }}>
+        <p className="text-sm" style={{ color: "#4A4A4A" }}>
           {loading
             ? "Loading…"
             : `${openCount} open order${openCount === 1 ? "" : "s"}`}
@@ -166,14 +166,14 @@ function Column({
   return (
     <section
       className="rounded-xl p-3 flex flex-col min-h-[60vh]"
-      style={{ backgroundColor: "#F8FAFC", border: "1px solid #E2E8F0" }}
+      style={{ backgroundColor: "#F5F7FA", border: "1px solid #E5E7EB" }}
     >
       <header className="flex items-center justify-between mb-3 px-1">
-        <h2 className="text-sm font-semibold" style={{ color: "#0F172A" }}>
+        <h2 className="text-sm font-semibold" style={{ color: "#1E1E1E" }}>
           {label}
         </h2>
         <span
-          className="text-xs font-bold px-2 py-0.5 rounded-full"
+          className="text-xs font-bold px-2 py-0.5 rounded-none"
           style={{ backgroundColor: accentBg, color: accent }}
         >
           {count}
@@ -192,7 +192,7 @@ function EmptyColumn({ status }: { status: OrderStatus }) {
         ? "Nothing in the kitchen right now."
         : "Nothing ready for pickup yet.";
   return (
-    <p className="text-xs text-center py-8 px-3" style={{ color: "#94A3B8" }}>
+    <p className="text-xs text-center py-8 px-3" style={{ color: "#6B7280" }}>
       {msg}
     </p>
   );
@@ -208,7 +208,7 @@ function OrderCard({
   return (
     <article
       className="rounded-lg p-3 bg-white shadow-sm"
-      style={{ border: "1px solid #E2E8F0" }}
+      style={{ border: "1px solid #E5E7EB" }}
     >
       <OrderDetailsBody order={order} compact />
 
@@ -250,7 +250,7 @@ function OrderCard({
             size="sm"
             className="w-full gap-1.5"
             onClick={() => onAdvance(order.id, "completed")}
-            style={{ backgroundColor: "#111318", color: "#FFFFFF" }}
+            style={{ backgroundColor: "#0F2B4D", color: "#FFFFFF" }}
           >
             <Check size={13} />
             Complete

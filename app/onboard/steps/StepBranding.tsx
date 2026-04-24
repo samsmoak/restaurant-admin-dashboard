@@ -81,10 +81,12 @@ export default function StepBranding({
           type="button"
           onClick={finish}
           disabled={submitting}
-          className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all disabled:opacity-50"
+          className="inline-flex items-center justify-center px-5 py-2 font-semibold text-sm transition-all disabled:opacity-50 hover:opacity-90"
           style={{
-            background: "linear-gradient(135deg, #FFB627 0%, #FF5A3C 100%)",
+            backgroundColor: "#0F2B4D",
             color: "#FFFFFF",
+            borderRadius: 6,
+            minWidth: 180,
           }}
         >
           {submitting ? "Finishing…" : logoUrl ? "Finish & go to dashboard" : "Skip & finish"}
@@ -93,8 +95,8 @@ export default function StepBranding({
     >
       {error && (
         <div
-          className="text-sm px-4 py-2.5 rounded-lg"
-          style={{ backgroundColor: "#FEF2F2", color: "#DC2626", border: "1px solid #FECACA" }}
+          className="text-sm px-4 py-2.5"
+          style={{ backgroundColor: "#FEF2F2", color: "#DC2626", border: "1px solid #DC2626" }}
         >
           {error}
         </div>
@@ -102,14 +104,14 @@ export default function StepBranding({
 
       <div className="flex items-center gap-4">
         <div
-          className="w-24 h-24 rounded-2xl overflow-hidden flex items-center justify-center shrink-0"
-          style={{ backgroundColor: "#F8FAFC", border: "1.5px dashed #CBD5E1" }}
+          className="w-24 h-24 overflow-hidden flex items-center justify-center shrink-0"
+          style={{ backgroundColor: "#F5F7FA", border: "1.5px dashed #6B7280" }}
         >
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
           ) : (
-            <ImageIcon size={28} style={{ color: "#94A3B8" }} />
+            <ImageIcon size={28} style={{ color: "#6B7280" }} />
           )}
         </div>
 
@@ -125,8 +127,8 @@ export default function StepBranding({
             type="button"
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
-            style={{ backgroundColor: "#111318", color: "#FFFFFF" }}
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-semibold transition-all disabled:opacity-50 hover:opacity-90"
+            style={{ backgroundColor: "#0F2B4D", color: "#FFFFFF", borderRadius: 6 }}
           >
             <Upload size={14} />
             {uploading ? "Uploading…" : logoUrl ? "Replace logo" : "Upload logo"}
@@ -135,14 +137,14 @@ export default function StepBranding({
             <button
               type="button"
               onClick={remove}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium"
               style={{ color: "#DC2626" }}
             >
               <Trash2 size={13} />
               Remove
             </button>
           )}
-          <p className="text-xs" style={{ color: "#94A3B8" }}>
+          <p className="text-xs" style={{ color: "#6B7280" }}>
             PNG or JPG, up to 5 MB.
           </p>
         </div>

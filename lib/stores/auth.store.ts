@@ -9,7 +9,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { setStoredToken, getStoredToken, isApiError } from '@/lib/api/client';
+import { setStoredToken, getStoredToken, isApiError, setUnauthorizedHandler } from '@/lib/api/client';
 import { authApi } from '@/lib/api/endpoints';
 import type { GoAuthResponse, GoFinalizeResult, GoMembership, GoUser } from '@/lib/api/dto';
 
@@ -166,3 +166,22 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+// Wire the API client's 401 hook to clear auth state and bounce to /login.
+// Using window.location.href guarantees a clean reload from any route, with no
+// flash of stale chrome (the dashboard layout's hydration gate then takes over).
+if (typeof window !== 'undefined') {
+  setUnauthorizedHandler(() => {
+    useAuthStore.setState({
+      token: null,
+      user: null,
+      memberships: [],
+      activeRestaurantId: null,
+      activeRole: null,
+    });
+    const currentPath = window.location.pathname;
+    if (currentPath === '/login') return;
+    window.location.href =
+      '/login?error=' + encodeURIComponent('Your session expired. Please sign in again.');
+  });
+}

@@ -62,8 +62,13 @@ export default function StepRestaurant({
           form="step-restaurant"
           type="submit"
           disabled={submitting}
-          className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all disabled:opacity-50"
-          style={{ backgroundColor: "#111318", color: "#FFFFFF" }}
+          className="inline-flex items-center justify-center px-5 py-2 font-semibold text-sm transition-all disabled:opacity-50 hover:opacity-90"
+          style={{
+            backgroundColor: "#0F2B4D",
+            color: "#FFFFFF",
+            borderRadius: 6,
+            minWidth: 132,
+          }}
         >
           {submitting ? "Saving…" : "Continue"}
         </button>
@@ -71,32 +76,32 @@ export default function StepRestaurant({
     >
       {error && (
         <div
-          className="text-sm px-4 py-2.5 rounded-lg"
-          style={{ backgroundColor: "#FEF2F2", color: "#DC2626", border: "1px solid #FECACA" }}
+          className="text-sm px-3.5 py-2.5"
+          style={{ backgroundColor: "#FEF2F2", color: "#DC2626", border: "1px solid #DC2626", borderRadius: 4 }}
         >
           {error}
         </div>
       )}
       <form id="step-restaurant" onSubmit={submit} className="space-y-3">
-        <Field label="Restaurant name *">
+        <Field label="Restaurant name">
           <input
             type="text"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-lg text-sm outline-none"
-            style={{ border: "1px solid #E2E8F0", color: "#0F172A", backgroundColor: "#FFFFFF" }}
+            className="w-full px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-[#0F2B4D]"
+            style={{ border: "1px solid #E5E7EB", color: "#1E1E1E", backgroundColor: "#FFFFFF", borderRadius: 4 }}
             placeholder="Ember & Forge"
           />
         </Field>
-        <Field label="Phone number *">
+        <Field label="Phone number">
           <input
             type="tel"
             required
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-lg text-sm outline-none"
-            style={{ border: "1px solid #E2E8F0", color: "#0F172A", backgroundColor: "#FFFFFF" }}
+            className="w-full px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-[#0F2B4D]"
+            style={{ border: "1px solid #E5E7EB", color: "#1E1E1E", backgroundColor: "#FFFFFF", borderRadius: 4 }}
             placeholder="(555) 123-4567"
           />
         </Field>
@@ -108,7 +113,7 @@ export default function StepRestaurant({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-sm font-medium mb-1.5" style={{ color: "#0F172A" }}>
+      <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#4A4A4A" }}>
         {label}
       </label>
       {children}

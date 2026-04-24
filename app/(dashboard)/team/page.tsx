@@ -16,7 +16,7 @@ export default function TeamPage() {
   return (
     <div className="max-w-4xl">
       {loading && invites.length === 0 ? (
-        <p style={{ color: "#64748B" }}>Loading…</p>
+        <p style={{ color: "#4A4A4A" }}>Loading…</p>
       ) : (
         <InvitesView invites={invites} />
       )}

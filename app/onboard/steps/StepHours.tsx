@@ -85,8 +85,13 @@ export default function StepHours({
           form="step-hours"
           type="submit"
           disabled={submitting}
-          className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all disabled:opacity-50"
-          style={{ backgroundColor: "#111318", color: "#FFFFFF" }}
+          className="inline-flex items-center justify-center px-5 py-2 font-semibold text-sm transition-all disabled:opacity-50 hover:opacity-90"
+          style={{
+            backgroundColor: "#0F2B4D",
+            color: "#FFFFFF",
+            borderRadius: 6,
+            minWidth: 132,
+          }}
         >
           {submitting ? "Saving…" : "Continue"}
         </button>
@@ -94,8 +99,8 @@ export default function StepHours({
     >
       {error && (
         <div
-          className="text-sm px-4 py-2.5 rounded-lg"
-          style={{ backgroundColor: "#FEF2F2", color: "#DC2626", border: "1px solid #FECACA" }}
+          className="text-sm px-4 py-2.5"
+          style={{ backgroundColor: "#FEF2F2", color: "#DC2626", border: "1px solid #DC2626" }}
         >
           {error}
         </div>
@@ -103,14 +108,14 @@ export default function StepHours({
 
       <form id="step-hours" onSubmit={submit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1.5" style={{ color: "#0F172A" }}>
+          <label className="block text-sm font-medium mb-1.5" style={{ color: "#1E1E1E" }}>
             Currency *
           </label>
           <select
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
-            className="w-full h-10 px-3 text-sm rounded-lg outline-none"
-            style={{ border: "1px solid #E2E8F0", color: "#0F172A", backgroundColor: "#FFFFFF" }}
+            className="w-full h-10 px-3 text-sm outline-none"
+            style={{ border: "1px solid #E5E7EB", color: "#1E1E1E", backgroundColor: "#FFFFFF" }}
           >
             <option value="USD">USD — US Dollar</option>
             <option value="EUR">EUR — Euro</option>
@@ -122,8 +127,8 @@ export default function StepHours({
         </div>
 
         <div
-          className="rounded-lg overflow-hidden"
-          style={{ border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF" }}
+          className="overflow-hidden"
+          style={{ border: "1px solid #E5E7EB", backgroundColor: "#FFFFFF" }}
         >
           {DAYS.map(({ key, label }, idx) => {
             const day = hours[key] ?? { open: "09:00", close: "22:00", closed: false };
@@ -132,13 +137,13 @@ export default function StepHours({
                 key={key}
                 className="grid grid-cols-[110px_1fr_auto] items-center gap-3 px-4 py-3"
                 style={{
-                  borderTop: idx === 0 ? "none" : "1px solid #F1F5F9",
-                  backgroundColor: day.closed ? "#F8FAFC" : "#FFFFFF",
+                  borderTop: idx === 0 ? "none" : "1px solid #E5E7EB",
+                  backgroundColor: day.closed ? "#F5F7FA" : "#FFFFFF",
                 }}
               >
                 <span
                   className="text-sm font-medium"
-                  style={{ color: day.closed ? "#94A3B8" : "#0F172A" }}
+                  style={{ color: day.closed ? "#6B7280" : "#1E1E1E" }}
                 >
                   {label}
                 </span>
@@ -148,14 +153,14 @@ export default function StepHours({
                     value={day.open}
                     onChange={(e) => updateHour(key, "open", e.target.value)}
                     disabled={day.closed}
-                    className="px-2.5 py-1.5 rounded text-sm outline-none"
+                    className="px-2.5 py-1.5 text-sm outline-none"
                     style={{
-                      border: "1px solid #E2E8F0",
+                      border: "1px solid #E5E7EB",
                       maxWidth: 110,
                       opacity: day.closed ? 0.4 : 1,
                     }}
                   />
-                  <span className="text-xs" style={{ color: "#94A3B8" }}>
+                  <span className="text-xs" style={{ color: "#6B7280" }}>
                     to
                   </span>
                   <input
@@ -163,16 +168,16 @@ export default function StepHours({
                     value={day.close}
                     onChange={(e) => updateHour(key, "close", e.target.value)}
                     disabled={day.closed}
-                    className="px-2.5 py-1.5 rounded text-sm outline-none"
+                    className="px-2.5 py-1.5 text-sm outline-none"
                     style={{
-                      border: "1px solid #E2E8F0",
+                      border: "1px solid #E5E7EB",
                       maxWidth: 110,
                       opacity: day.closed ? 0.4 : 1,
                     }}
                   />
                 </div>
                 <label className="flex items-center gap-2 text-xs font-medium pl-2">
-                  <span style={{ color: day.closed ? "#DC2626" : "#64748B" }}>
+                  <span style={{ color: day.closed ? "#DC2626" : "#4A4A4A" }}>
                     {day.closed ? "Closed" : "Open"}
                   </span>
                   <Switch

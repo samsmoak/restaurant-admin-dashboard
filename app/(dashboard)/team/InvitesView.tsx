@@ -56,13 +56,13 @@ export default function InvitesView({ invites }: { invites: GoInvite[] }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm" style={{ color: "#64748B" }}>
+        <p className="text-sm" style={{ color: "#4A4A4A" }}>
           {invites.length} invite{invites.length === 1 ? "" : "s"}
         </p>
         <Button
           onClick={() => setCreateOpen(true)}
           className="gap-2"
-          style={{ backgroundColor: "#111318", color: "#FFFFFF" }}
+          style={{ backgroundColor: "#0F2B4D", color: "#FFFFFF" }}
         >
           <Plus size={15} /> New invite
         </Button>
@@ -70,16 +70,16 @@ export default function InvitesView({ invites }: { invites: GoInvite[] }) {
 
       <div
         className="rounded-lg overflow-hidden"
-        style={{ border: "1px solid #E2E8F0", backgroundColor: "#FFFFFF" }}
+        style={{ border: "1px solid #E5E7EB", backgroundColor: "#FFFFFF" }}
       >
         {invites.length === 0 ? (
           <div className="px-6 py-12 text-center">
-            <p className="font-semibold text-sm" style={{ color: "#0F172A" }}>
+            <p className="font-semibold text-sm" style={{ color: "#1E1E1E" }}>
               No invites yet
             </p>
             <p
               className="text-xs mt-1 max-w-md mx-auto"
-              style={{ color: "#64748B" }}
+              style={{ color: "#4A4A4A" }}
             >
               Generate a one-time code and share the link with someone you want
               to grant restaurant-admin access to.
@@ -90,7 +90,7 @@ export default function InvitesView({ invites }: { invites: GoInvite[] }) {
             <thead>
               <tr
                 className="text-left text-xs uppercase tracking-wider"
-                style={{ backgroundColor: "#F8FAFC", color: "#64748B" }}
+                style={{ backgroundColor: "#F5F7FA", color: "#4A4A4A" }}
               >
                 <th className="px-4 py-2.5 font-semibold">Code</th>
                 <th className="px-4 py-2.5 font-semibold">For</th>
@@ -111,14 +111,14 @@ export default function InvitesView({ invites }: { invites: GoInvite[] }) {
                     <td className="px-4 py-3">
                       <p
                         className="font-mono font-semibold"
-                        style={{ color: "#0F172A" }}
+                        style={{ color: "#1E1E1E" }}
                       >
                         {inv.code}
                       </p>
                       {inv.note && (
                         <p
                           className="text-xs"
-                          style={{ color: "#94A3B8" }}
+                          style={{ color: "#6B7280" }}
                         >
                           {inv.note}
                         </p>
@@ -126,14 +126,14 @@ export default function InvitesView({ invites }: { invites: GoInvite[] }) {
                     </td>
                     <td className="px-4 py-3">
                       {inv.email ? (
-                        <span style={{ color: "#0F172A" }}>{inv.email}</span>
+                        <span style={{ color: "#1E1E1E" }}>{inv.email}</span>
                       ) : (
-                        <span style={{ color: "#94A3B8" }}>Anyone</span>
+                        <span style={{ color: "#6B7280" }}>Anyone</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide"
+                        className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-none uppercase tracking-wide"
                         style={{ backgroundColor: s.bg, color: s.fg }}
                       >
                         {status}
@@ -141,13 +141,13 @@ export default function InvitesView({ invites }: { invites: GoInvite[] }) {
                       {status === "used" && inv.used_at && (
                         <p
                           className="text-xs mt-0.5"
-                          style={{ color: "#94A3B8" }}
+                          style={{ color: "#6B7280" }}
                         >
                           {format(new Date(inv.used_at), "MMM d, h:mm a")}
                         </p>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs" style={{ color: "#64748B" }}>
+                    <td className="px-4 py-3 text-xs" style={{ color: "#4A4A4A" }}>
                       {format(new Date(inv.created_at), "MMM d, yyyy")}
                     </td>
                     <td className="px-4 py-3">
@@ -253,7 +253,7 @@ function CreateInviteDialog({
                 placeholder="maria@restaurant.com"
                 className="mt-1.5"
               />
-              <p className="text-xs mt-1" style={{ color: "#64748B" }}>
+              <p className="text-xs mt-1" style={{ color: "#4A4A4A" }}>
                 If set, the invite can only be redeemed by a Google/email
                 account with this exact address.
               </p>
@@ -298,7 +298,7 @@ function CreateInviteDialog({
                   <Copy size={13} />
                 </Button>
               </div>
-              <p className="text-xs mt-2" style={{ color: "#64748B" }}>
+              <p className="text-xs mt-2" style={{ color: "#4A4A4A" }}>
                 Anyone with this link can create one restaurant-admin account.
                 The link stops working once it's used or revoked.
               </p>

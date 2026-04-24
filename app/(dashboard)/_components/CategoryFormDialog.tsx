@@ -124,10 +124,10 @@ export default function CategoryFormDialog({
           </div>
           <div className="flex items-center justify-between py-2">
             <div>
-              <p className="text-sm font-medium" style={{ color: "#0F172A" }}>
+              <p className="text-sm font-medium" style={{ color: "#1E1E1E" }}>
                 Active
               </p>
-              <p className="text-xs" style={{ color: "#64748B" }}>
+              <p className="text-xs" style={{ color: "#4A4A4A" }}>
                 Hidden categories don't appear on the public menu.
               </p>
             </div>

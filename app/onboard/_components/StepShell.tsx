@@ -5,8 +5,8 @@ import { ChevronLeft } from "lucide-react";
 
 /**
  * Wraps a single wizard step with a consistent header, animated content area,
- * and footer. Individual steps pass their own footer (typically a submit
- * button) as `footer`.
+ * and a flex footer that puts Back (if available) on the left and whatever
+ * the step passes as `footer` (usually the submit button) on the right.
  */
 export default function StepShell({
   eyebrow,
@@ -33,33 +33,22 @@ export default function StepShell({
       className="flex flex-col gap-6"
     >
       <header>
-        {onBack && (
-          <button
-            type="button"
-            onClick={onBack}
-            className="inline-flex items-center gap-1 text-xs font-medium mb-3 transition-colors hover:opacity-70"
-            style={{ color: "#64748B" }}
-          >
-            <ChevronLeft size={14} />
-            Back
-          </button>
-        )}
         {eyebrow && (
           <p
             className="text-xs tracking-[0.25em] uppercase font-semibold mb-1.5"
-            style={{ color: "#FF5A3C" }}
+            style={{ color: "#0F2B4D" }}
           >
             {eyebrow}
           </p>
         )}
         <h2
           className="text-2xl font-bold"
-          style={{ color: "#0F172A", fontFamily: "var(--font-playfair, serif)" }}
+          style={{ color: "#1E1E1E" }}
         >
           {title}
         </h2>
         {description && (
-          <p className="text-sm mt-1.5" style={{ color: "#64748B" }}>
+          <p className="text-sm mt-1.5" style={{ color: "#4A4A4A" }}>
             {description}
           </p>
         )}
@@ -67,7 +56,27 @@ export default function StepShell({
 
       <div className="flex flex-col gap-4">{children}</div>
 
-      <footer className="pt-2">{footer}</footer>
+      <footer className="flex items-center justify-between gap-3 pt-2">
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold transition-all hover:bg-slate-50"
+            style={{
+              backgroundColor: "#FFFFFF",
+              color: "#1E1E1E",
+              border: "1px solid #E5E7EB",
+              borderRadius: 6,
+            }}
+          >
+            <ChevronLeft size={15} />
+            Back
+          </button>
+        ) : (
+          <span />
+        )}
+        <div className="flex-1 flex justify-end">{footer}</div>
+      </footer>
     </motion.div>
   );
 }

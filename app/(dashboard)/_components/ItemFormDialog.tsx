@@ -238,8 +238,8 @@ export default function ItemFormDialog({
             <div
               className="w-20 h-20 rounded-lg overflow-hidden flex items-center justify-center shrink-0"
               style={{
-                backgroundColor: "#F8FAFC",
-                border: "1.5px dashed #CBD5E1",
+                backgroundColor: "#F5F7FA",
+                border: "1.5px dashed #6B7280",
               }}
             >
               {imageUrl ? (
@@ -250,7 +250,7 @@ export default function ItemFormDialog({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <ImageIcon size={22} style={{ color: "#94A3B8" }} />
+                <ImageIcon size={22} style={{ color: "#6B7280" }} />
               )}
             </div>
             <div className="flex flex-col gap-2">
@@ -333,7 +333,7 @@ export default function ItemFormDialog({
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 className="mt-1.5 w-full h-9 px-3 text-sm rounded-md"
-                style={{ border: "1px solid #E2E8F0", color: "#0F172A" }}
+                style={{ border: "1px solid #E5E7EB", color: "#1E1E1E" }}
               >
                 {categories.length === 0 && (
                   <option value="">(create a category first)</option>
@@ -357,19 +357,19 @@ export default function ItemFormDialog({
             </div>
             <div className="flex items-center justify-between pt-6">
               <div className="flex items-center gap-2">
-                <Star size={14} style={{ color: "#FFB627" }} />
+                <Star size={14} style={{ color: "#0F2B4D" }} />
                 <Label className="!cursor-pointer">Featured</Label>
               </div>
               <Switch checked={isFeatured} onCheckedChange={setIsFeatured} />
             </div>
             <div className="sm:col-span-2 flex items-center justify-between py-2 px-3 rounded-lg"
-              style={{ backgroundColor: "#F8FAFC" }}
+              style={{ backgroundColor: "#F5F7FA" }}
             >
               <div>
-                <p className="text-sm font-medium" style={{ color: "#0F172A" }}>
+                <p className="text-sm font-medium" style={{ color: "#1E1E1E" }}>
                   Available for ordering
                 </p>
-                <p className="text-xs" style={{ color: "#64748B" }}>
+                <p className="text-xs" style={{ color: "#4A4A4A" }}>
                   Off = hidden from customers until you turn it back on.
                 </p>
               </div>
@@ -381,10 +381,10 @@ export default function ItemFormDialog({
           <section>
             <div className="flex items-center justify-between mb-2">
               <div>
-                <h3 className="text-sm font-semibold" style={{ color: "#0F172A" }}>
+                <h3 className="text-sm font-semibold" style={{ color: "#1E1E1E" }}>
                   Sizes
                 </h3>
-                <p className="text-xs" style={{ color: "#64748B" }}>
+                <p className="text-xs" style={{ color: "#4A4A4A" }}>
                   Price modifiers add to the base price. Leave empty for no sizing.
                 </p>
               </div>
@@ -401,7 +401,7 @@ export default function ItemFormDialog({
             {sizes.length === 0 ? (
               <p
                 className="text-xs text-center py-3 rounded-md"
-                style={{ backgroundColor: "#F8FAFC", color: "#94A3B8" }}
+                style={{ backgroundColor: "#F5F7FA", color: "#6B7280" }}
               >
                 No sizes — customers order the base item directly.
               </p>
@@ -427,7 +427,7 @@ export default function ItemFormDialog({
                     />
                     <label
                       className="flex items-center gap-1.5 text-xs whitespace-nowrap px-2"
-                      style={{ color: "#64748B" }}
+                      style={{ color: "#4A4A4A" }}
                     >
                       <input
                         type="radio"
@@ -455,10 +455,10 @@ export default function ItemFormDialog({
           <section>
             <div className="flex items-center justify-between mb-2">
               <div>
-                <h3 className="text-sm font-semibold" style={{ color: "#0F172A" }}>
+                <h3 className="text-sm font-semibold" style={{ color: "#1E1E1E" }}>
                   Extras
                 </h3>
-                <p className="text-xs" style={{ color: "#64748B" }}>
+                <p className="text-xs" style={{ color: "#4A4A4A" }}>
                   Optional add-ons with their own price.
                 </p>
               </div>
@@ -475,7 +475,7 @@ export default function ItemFormDialog({
             {extras.length === 0 ? (
               <p
                 className="text-xs text-center py-3 rounded-md"
-                style={{ backgroundColor: "#F8FAFC", color: "#94A3B8" }}
+                style={{ backgroundColor: "#F5F7FA", color: "#6B7280" }}
               >
                 No extras on this item.
               </p>

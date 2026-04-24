@@ -19,7 +19,7 @@ export default function SettingsPage() {
       <div className="max-w-3xl">
         <div
           className="rounded-lg p-4"
-          style={{ backgroundColor: "#FEF2F2", border: "1px solid #FECACA" }}
+          style={{ backgroundColor: "#FEF2F2", border: "1px solid #DC2626" }}
         >
           <p className="text-sm font-semibold" style={{ color: "#991B1B" }}>
             Could not load restaurant settings
@@ -35,7 +35,7 @@ export default function SettingsPage() {
   if (!restaurant) {
     return (
       <div className="max-w-3xl">
-        <p style={{ color: "#64748B" }}>{loading ? "Loading…" : "No restaurant."}</p>
+        <p style={{ color: "#4A4A4A" }}>{loading ? "Loading…" : "No restaurant."}</p>
       </div>
     );
   }

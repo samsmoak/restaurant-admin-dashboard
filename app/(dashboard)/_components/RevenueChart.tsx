@@ -32,32 +32,32 @@ export default function RevenueChart({
         <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
         <XAxis
           dataKey="label"
-          stroke="#94A3B8"
+          stroke="#6B7280"
           tick={{ fontSize: 11 }}
           tickLine={false}
-          axisLine={{ stroke: "#E2E8F0" }}
+          axisLine={{ stroke: "#E5E7EB" }}
         />
         <YAxis
-          stroke="#94A3B8"
+          stroke="#6B7280"
           tick={{ fontSize: 11 }}
           tickFormatter={fmt}
           tickLine={false}
-          axisLine={{ stroke: "#E2E8F0" }}
+          axisLine={{ stroke: "#E5E7EB" }}
         />
         <Tooltip
           formatter={(value) => [fmt(Number(value) || 0), "Revenue"]}
           contentStyle={{
             borderRadius: 8,
-            border: "1px solid #E2E8F0",
+            border: "1px solid #E5E7EB",
             fontSize: 12,
           }}
         />
         <Line
           type="monotone"
           dataKey="revenue"
-          stroke="#FF5A3C"
+          stroke="#0F2B4D"
           strokeWidth={2.5}
-          dot={{ fill: "#FF5A3C", r: 3 }}
+          dot={{ fill: "#0F2B4D", r: 3 }}
           activeDot={{ r: 5 }}
         />
       </LineChart>

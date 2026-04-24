@@ -20,6 +20,12 @@ export const authApi = {
     api.post<GoAuthResponse>('/api/auth/google', { id_token }, { anonymous: true }),
   signupCustomer: (input: { full_name: string; email: string; phone: string; password: string }) =>
     api.post<GoAuthResponse>('/api/auth/signup/customer', input, { anonymous: true }),
+  checkEmailAvailable: (email: string) =>
+    api.post<{ available: boolean; registered_as?: 'admin' | 'customer' }>(
+      '/api/auth/email-available',
+      { email },
+      { anonymous: true }
+    ),
   memberships: () => api.get<{ memberships: GoMembership[] }>('/api/auth/memberships'),
   finalize: (invite_code: string) =>
     api.post<GoFinalizeResult>('/api/auth/admin/finalize', { invite_code }),

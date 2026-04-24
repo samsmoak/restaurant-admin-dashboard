@@ -166,7 +166,7 @@ export default function AnalyticsPage() {
             className="px-3 py-1.5 rounded-md text-xs font-semibold transition-all"
             style={{
               backgroundColor: range === r.key ? "#FFFFFF" : "transparent",
-              color: range === r.key ? "#0F172A" : "#64748B",
+              color: range === r.key ? "#1E1E1E" : "#4A4A4A",
               boxShadow:
                 range === r.key ? "0 1px 2px rgba(15,23,42,0.06)" : "none",
             }}
@@ -207,27 +207,27 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         <section
           className="lg:col-span-2 rounded-xl p-5"
-          style={{ backgroundColor: "#FFFFFF", border: "1px solid #E2E8F0" }}
+          style={{ backgroundColor: "#FFFFFF", border: "1px solid #E5E7EB" }}
         >
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold" style={{ color: "#0F172A" }}>
+            <h3 className="text-sm font-semibold" style={{ color: "#1E1E1E" }}>
               Revenue
             </h3>
-            <span className="text-xs" style={{ color: "#64748B" }}>
+            <span className="text-xs" style={{ color: "#4A4A4A" }}>
               {range === "today" ? "by hour" : "by day"}
             </span>
           </div>
           {loading ? (
             <div
               className="h-64 flex items-center justify-center"
-              style={{ color: "#94A3B8" }}
+              style={{ color: "#6B7280" }}
             >
               Loading…
             </div>
           ) : orders.length === 0 ? (
             <div
               className="h-64 flex items-center justify-center text-sm"
-              style={{ color: "#94A3B8" }}
+              style={{ color: "#6B7280" }}
             >
               No orders in this range.
             </div>
@@ -238,20 +238,20 @@ export default function AnalyticsPage() {
 
         <section
           className="rounded-xl p-5"
-          style={{ backgroundColor: "#FFFFFF", border: "1px solid #E2E8F0" }}
+          style={{ backgroundColor: "#FFFFFF", border: "1px solid #E5E7EB" }}
         >
           <h3
             className="text-sm font-semibold mb-3"
-            style={{ color: "#0F172A" }}
+            style={{ color: "#1E1E1E" }}
           >
             Top items
           </h3>
           {loading ? (
-            <p className="text-sm" style={{ color: "#94A3B8" }}>
+            <p className="text-sm" style={{ color: "#6B7280" }}>
               Loading…
             </p>
           ) : top.length === 0 ? (
-            <p className="text-sm" style={{ color: "#94A3B8" }}>
+            <p className="text-sm" style={{ color: "#6B7280" }}>
               Nothing sold yet.
             </p>
           ) : (
@@ -263,7 +263,7 @@ export default function AnalyticsPage() {
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span
-                      className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                      className="w-5 h-5 rounded-none flex items-center justify-center text-xs font-bold shrink-0"
                       style={{
                         backgroundColor: "#FEF3C7",
                         color: "#92400E",
@@ -273,14 +273,14 @@ export default function AnalyticsPage() {
                     </span>
                     <span
                       className="text-sm truncate"
-                      style={{ color: "#0F172A" }}
+                      style={{ color: "#1E1E1E" }}
                     >
                       {t.name}
                     </span>
                   </div>
                   <span
                     className="text-sm font-semibold tabular-nums"
-                    style={{ color: "#64748B" }}
+                    style={{ color: "#4A4A4A" }}
                   >
                     ×{t.count}
                   </span>
@@ -310,28 +310,28 @@ function KpiCard({
   const up = change > 1;
   const down = change < -1;
   const Icon = up ? TrendingUp : down ? TrendingDown : Minus;
-  const color = up ? "#10B981" : down ? "#DC2626" : "#94A3B8";
-  const bg = up ? "#F0FDF4" : down ? "#FEF2F2" : "#F8FAFC";
+  const color = up ? "#10B981" : down ? "#DC2626" : "#6B7280";
+  const bg = up ? "#F0FDF4" : down ? "#FEF2F2" : "#F5F7FA";
 
   return (
     <div
       className="rounded-xl p-4"
-      style={{ backgroundColor: "#FFFFFF", border: "1px solid #E2E8F0" }}
+      style={{ backgroundColor: "#FFFFFF", border: "1px solid #E5E7EB" }}
     >
       <p
         className="text-xs font-semibold uppercase tracking-wider"
-        style={{ color: "#94A3B8" }}
+        style={{ color: "#6B7280" }}
       >
         {label}
       </p>
       <p
         className="text-2xl font-bold mt-1 tabular-nums"
-        style={{ color: "#0F172A" }}
+        style={{ color: "#1E1E1E" }}
       >
         {loading ? "—" : value}
       </p>
       <div
-        className="inline-flex items-center gap-1 text-xs font-semibold mt-2 px-2 py-0.5 rounded-full"
+        className="inline-flex items-center gap-1 text-xs font-semibold mt-2 px-2 py-0.5 rounded-none"
         style={{ backgroundColor: bg, color }}
       >
         <Icon size={11} />

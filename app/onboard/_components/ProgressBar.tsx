@@ -32,12 +32,12 @@ export default function ProgressBar({
             <li key={step.key} className="flex-1 flex items-center gap-2 min-w-0">
               <div className="relative flex items-center justify-center shrink-0">
                 <motion.div
-                  className="rounded-full flex items-center justify-center text-xs font-bold"
+                  className="flex items-center justify-center text-xs font-bold"
                   style={{
                     width: 32,
                     height: 32,
-                    backgroundColor: done ? "#10B981" : active ? "#111318" : "#E2E8F0",
-                    color: done || active ? "#FFFFFF" : "#64748B",
+                    backgroundColor: done ? "#0F2B4D" : active ? "#0F2B4D" : "#E5E7EB",
+                    color: done || active ? "#FFFFFF" : "#4A4A4A",
                   }}
                   animate={{
                     scale: active ? 1.08 : 1,
@@ -48,10 +48,10 @@ export default function ProgressBar({
                 </motion.div>
                 {active && !done && (
                   <motion.div
-                    className="absolute rounded-full"
+                    className="absolute"
                     style={{
                       inset: -4,
-                      border: "2px solid #E8A045",
+                      border: "2px solid #0F2B4D",
                     }}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -61,7 +61,7 @@ export default function ProgressBar({
               </div>
               <span
                 className="hidden sm:inline text-xs font-medium truncate"
-                style={{ color: active ? "#0F172A" : "#94A3B8" }}
+                style={{ color: active ? "#1E1E1E" : "#6B7280" }}
               >
                 {step.title}
               </span>
@@ -72,14 +72,12 @@ export default function ProgressBar({
 
       {/* Filled bar */}
       <div
-        className="relative h-1.5 rounded-full overflow-hidden"
-        style={{ backgroundColor: "#E2E8F0" }}
+        className="relative h-1.5 overflow-hidden"
+        style={{ backgroundColor: "#E5E7EB" }}
       >
         <motion.div
-          className="absolute inset-y-0 left-0 rounded-full"
-          style={{
-            background: "linear-gradient(90deg, #FFB627 0%, #FF5A3C 100%)",
-          }}
+          className="absolute inset-y-0 left-0"
+          style={{ backgroundColor: "#0F2B4D" }}
           initial={false}
           animate={{ width: `${percent}%` }}
           transition={{ type: "spring", stiffness: 180, damping: 22 }}

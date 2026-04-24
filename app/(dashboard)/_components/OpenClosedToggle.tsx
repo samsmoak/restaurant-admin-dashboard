@@ -39,14 +39,14 @@ export default function OpenClosedToggle({ variant = "sidebar" }: Props) {
       >
         <div className="flex items-center gap-2 min-w-0">
           <span
-            className="w-2 h-2 rounded-full shrink-0"
+            className="w-2 h-2 rounded-none shrink-0"
             style={{ backgroundColor: closed ? "#DC2626" : "#10B981" }}
           />
           <div className="min-w-0">
             <p className="text-xs font-semibold text-white truncate">
               {closed ? "Paused" : "Accepting orders"}
             </p>
-            <p className="text-[10px]" style={{ color: "#94A3B8" }}>
+            <p className="text-[10px]" style={{ color: "#6B7280" }}>
               {closed ? "Manually closed" : "Following hours"}
             </p>
           </div>
@@ -65,19 +65,19 @@ export default function OpenClosedToggle({ variant = "sidebar" }: Props) {
       className="rounded-xl p-4 flex items-center justify-between"
       style={{
         backgroundColor: closed ? "#FEF2F2" : "#F0FDF4",
-        border: `1px solid ${closed ? "#FECACA" : "#BBF7D0"}`,
+        border: `1px solid ${closed ? "#DC2626" : "#BBF7D0"}`,
       }}
     >
       <div className="flex items-center gap-3">
         <span
-          className="w-3 h-3 rounded-full"
+          className="w-3 h-3 rounded-none"
           style={{ backgroundColor: closed ? "#DC2626" : "#10B981" }}
         />
         <div>
-          <p className="text-sm font-semibold" style={{ color: "#0F172A" }}>
+          <p className="text-sm font-semibold" style={{ color: "#1E1E1E" }}>
             {closed ? "Paused — not accepting orders" : "Accepting orders"}
           </p>
-          <p className="text-xs" style={{ color: "#64748B" }}>
+          <p className="text-xs" style={{ color: "#4A4A4A" }}>
             {closed
               ? "Customers see a closed status on the landing page."
               : "Following the opening-hours schedule."}

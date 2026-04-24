@@ -166,8 +166,8 @@ export default function SettingsForm({
           <div
             className="w-24 h-24 rounded-2xl flex items-center justify-center overflow-hidden shrink-0"
             style={{
-              backgroundColor: "#F8FAFC",
-              border: "1.5px dashed #CBD5E1",
+              backgroundColor: "#F5F7FA",
+              border: "1.5px dashed #6B7280",
             }}
           >
             {logoUrl ? (
@@ -178,7 +178,7 @@ export default function SettingsForm({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <ImageIcon size={28} style={{ color: "#94A3B8" }} />
+              <ImageIcon size={28} style={{ color: "#6B7280" }} />
             )}
           </div>
 
@@ -195,7 +195,7 @@ export default function SettingsForm({
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all disabled:opacity-50"
-              style={{ backgroundColor: "#111318", color: "#FFFFFF" }}
+              style={{ backgroundColor: "#0F2B4D", color: "#FFFFFF" }}
             >
               <Upload size={15} />
               {uploading ? "Uploading…" : logoUrl ? "Replace logo" : "Upload logo"}
@@ -212,7 +212,7 @@ export default function SettingsForm({
                 Remove
               </button>
             )}
-            <p className="text-xs" style={{ color: "#94A3B8" }}>
+            <p className="text-xs" style={{ color: "#6B7280" }}>
               PNG or JPG, up to 5 MB.
             </p>
           </div>
@@ -345,7 +345,7 @@ export default function SettingsForm({
             className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md transition-colors"
             style={{
               color: "#475569",
-              border: "1px solid #E2E8F0",
+              border: "1px solid #E5E7EB",
               backgroundColor: "#FFFFFF",
             }}
           >
@@ -370,12 +370,12 @@ export default function SettingsForm({
                 className="grid grid-cols-[110px_1fr_auto] items-center gap-3 px-4 py-3"
                 style={{
                   borderTop: idx === 0 ? "none" : "1px solid #F1F5F9",
-                  backgroundColor: day.closed ? "#F8FAFC" : "#FFFFFF",
+                  backgroundColor: day.closed ? "#F5F7FA" : "#FFFFFF",
                 }}
               >
                 <span
                   className="text-sm font-medium"
-                  style={{ color: day.closed ? "#94A3B8" : "#0F172A" }}
+                  style={{ color: day.closed ? "#6B7280" : "#1E1E1E" }}
                 >
                   {label}
                 </span>
@@ -394,7 +394,7 @@ export default function SettingsForm({
                   />
                   <span
                     className="text-xs"
-                    style={{ color: day.closed ? "#CBD5E1" : "#94A3B8" }}
+                    style={{ color: day.closed ? "#6B7280" : "#6B7280" }}
                   >
                     to
                   </span>
@@ -412,7 +412,7 @@ export default function SettingsForm({
                 </div>
 
                 <label className="flex items-center gap-2 text-xs font-medium cursor-pointer pl-2"
-                  style={{ color: day.closed ? "#DC2626" : "#64748B" }}
+                  style={{ color: day.closed ? "#DC2626" : "#4A4A4A" }}
                 >
                   <span>{day.closed ? "Closed" : "Open"}</span>
                   <Switch
@@ -432,7 +432,7 @@ export default function SettingsForm({
           type="submit"
           disabled={saving}
           className="px-6 py-2.5 rounded-lg font-semibold text-sm transition-all disabled:opacity-50"
-          style={{ backgroundColor: "#111318", color: "#FFFFFF" }}
+          style={{ backgroundColor: "#0F2B4D", color: "#FFFFFF" }}
         >
           {saving ? "Saving…" : "Save changes"}
         </button>
@@ -472,14 +472,14 @@ function Section({
   return (
     <section
       className="rounded-xl border p-6"
-      style={{ backgroundColor: "#FFFFFF", borderColor: "#E2E8F0" }}
+      style={{ backgroundColor: "#FFFFFF", borderColor: "#E5E7EB" }}
     >
       <div className="mb-5">
-        <h2 className="text-base font-semibold" style={{ color: "#0F172A" }}>
+        <h2 className="text-base font-semibold" style={{ color: "#1E1E1E" }}>
           {title}
         </h2>
         {description && (
-          <p className="text-xs mt-1" style={{ color: "#64748B" }}>
+          <p className="text-xs mt-1" style={{ color: "#4A4A4A" }}>
             {description}
           </p>
         )}
@@ -502,7 +502,7 @@ function StudioField({
     <div className={fullWidth ? "sm:col-span-2" : undefined}>
       <label
         className="block text-xs font-semibold mb-1.5 tracking-wide uppercase"
-        style={{ color: "#64748B" }}
+        style={{ color: "#4A4A4A" }}
       >
         {label}
       </label>

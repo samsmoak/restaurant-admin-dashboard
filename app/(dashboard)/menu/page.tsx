@@ -123,7 +123,7 @@ export default function MenuManagementPage() {
         {/* ITEMS */}
         <TabsContent value="items" className="space-y-4">
           <div className="flex justify-between items-center">
-            <p className="text-sm" style={{ color: "#64748B" }}>
+            <p className="text-sm" style={{ color: "#4A4A4A" }}>
               {loading
                 ? "Loading…"
                 : `${items.length} item${items.length === 1 ? "" : "s"}`}
@@ -138,7 +138,7 @@ export default function MenuManagementPage() {
                 setItemDialogOpen(true);
               }}
               className="gap-2"
-              style={{ backgroundColor: "#111318", color: "#FFFFFF" }}
+              style={{ backgroundColor: "#0F2B4D", color: "#FFFFFF" }}
             >
               <Plus size={15} /> Add item
             </Button>
@@ -180,7 +180,7 @@ export default function MenuManagementPage() {
         {/* CATEGORIES */}
         <TabsContent value="categories" className="space-y-4">
           <div className="flex justify-between items-center">
-            <p className="text-sm" style={{ color: "#64748B" }}>
+            <p className="text-sm" style={{ color: "#4A4A4A" }}>
               {loading
                 ? "Loading…"
                 : `${categories.length} categor${categories.length === 1 ? "y" : "ies"}`}
@@ -191,7 +191,7 @@ export default function MenuManagementPage() {
                 setCategoryDialogOpen(true);
               }}
               className="gap-2"
-              style={{ backgroundColor: "#111318", color: "#FFFFFF" }}
+              style={{ backgroundColor: "#0F2B4D", color: "#FFFFFF" }}
             >
               <Plus size={15} /> Add category
             </Button>
@@ -207,14 +207,14 @@ export default function MenuManagementPage() {
               className="rounded-lg overflow-hidden"
               style={{
                 backgroundColor: "#FFFFFF",
-                border: "1px solid #E2E8F0",
+                border: "1px solid #E5E7EB",
               }}
             >
               <table className="w-full text-sm">
                 <thead>
                   <tr
                     className="text-left text-xs uppercase tracking-wider"
-                    style={{ backgroundColor: "#F8FAFC", color: "#64748B" }}
+                    style={{ backgroundColor: "#F5F7FA", color: "#4A4A4A" }}
                   >
                     <th className="px-4 py-2.5 font-semibold">Name</th>
                     <th className="px-4 py-2.5 font-semibold">Description</th>
@@ -229,14 +229,14 @@ export default function MenuManagementPage() {
                     return (
                       <tr key={c.id} style={{ borderTop: "1px solid #F1F5F9" }}>
                         <td className="px-4 py-3">
-                          <p className="font-semibold" style={{ color: "#0F172A" }}>
+                          <p className="font-semibold" style={{ color: "#1E1E1E" }}>
                             {c.name}
                           </p>
-                          <p className="text-xs" style={{ color: "#94A3B8" }}>
+                          <p className="text-xs" style={{ color: "#6B7280" }}>
                             {itemCount} item{itemCount === 1 ? "" : "s"}
                           </p>
                         </td>
-                        <td className="px-4 py-3" style={{ color: "#64748B" }}>
+                        <td className="px-4 py-3" style={{ color: "#4A4A4A" }}>
                           {c.description || "—"}
                         </td>
                         <td className="px-4 py-3 text-center tabular-nums">
@@ -337,19 +337,19 @@ function ItemRow({
       className="rounded-lg p-3 flex gap-3"
       style={{
         backgroundColor: "#FFFFFF",
-        border: "1px solid #E2E8F0",
+        border: "1px solid #E5E7EB",
         opacity: item.is_available ? 1 : 0.65,
       }}
     >
       <div
         className="w-20 h-20 rounded-md overflow-hidden flex items-center justify-center shrink-0"
-        style={{ backgroundColor: "#F8FAFC" }}
+        style={{ backgroundColor: "#F5F7FA" }}
       >
         {item.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={item.image_url} alt="" className="w-full h-full object-cover" />
         ) : (
-          <ImageIcon size={18} style={{ color: "#CBD5E1" }} />
+          <ImageIcon size={18} style={{ color: "#6B7280" }} />
         )}
       </div>
 
@@ -358,14 +358,14 @@ function ItemRow({
           <div className="min-w-0">
             <p
               className="font-semibold truncate flex items-center gap-1.5"
-              style={{ color: "#0F172A" }}
+              style={{ color: "#1E1E1E" }}
             >
               {item.name}
               {item.is_featured && (
-                <Star size={12} fill="#FFB627" style={{ color: "#FFB627" }} />
+                <Star size={12} fill="#0F2B4D" style={{ color: "#0F2B4D" }} />
               )}
             </p>
-            <p className="text-xs truncate" style={{ color: "#94A3B8" }}>
+            <p className="text-xs truncate" style={{ color: "#6B7280" }}>
               {categoryName} · ${item.base_price.toFixed(2)}
             </p>
           </div>
@@ -380,7 +380,7 @@ function ItemRow({
         </div>
 
         {item.description && (
-          <p className="text-xs line-clamp-2 mt-0.5" style={{ color: "#64748B" }}>
+          <p className="text-xs line-clamp-2 mt-0.5" style={{ color: "#4A4A4A" }}>
             {item.description}
           </p>
         )}
@@ -388,21 +388,21 @@ function ItemRow({
         <div className="flex items-center gap-3 mt-2 text-xs">
           <label className="flex items-center gap-1.5 cursor-pointer">
             <Switch checked={item.is_available} onCheckedChange={onToggleAvailable} />
-            <span style={{ color: "#64748B" }}>
+            <span style={{ color: "#4A4A4A" }}>
               {item.is_available ? "Available" : "Hidden"}
             </span>
           </label>
           <label className="flex items-center gap-1.5 cursor-pointer">
             <Switch checked={item.is_featured} onCheckedChange={onToggleFeatured} />
-            <span style={{ color: "#64748B" }}>Featured</span>
+            <span style={{ color: "#4A4A4A" }}>Featured</span>
           </label>
           {(item.sizes?.length ?? 0) > 0 && (
-            <span style={{ color: "#94A3B8" }}>
+            <span style={{ color: "#6B7280" }}>
               · {item.sizes.length} size{item.sizes.length === 1 ? "" : "s"}
             </span>
           )}
           {(item.extras?.length ?? 0) > 0 && (
-            <span style={{ color: "#94A3B8" }}>
+            <span style={{ color: "#6B7280" }}>
               · {item.extras.length} extra{item.extras.length === 1 ? "" : "s"}
             </span>
           )}
@@ -416,13 +416,13 @@ function EmptyState({ title, body }: { title: string; body: string }) {
   return (
     <div
       className="rounded-lg py-12 px-6 text-center"
-      style={{ backgroundColor: "#F8FAFC", border: "1px dashed #CBD5E1" }}
+      style={{ backgroundColor: "#F5F7FA", border: "1px dashed #6B7280" }}
     >
-      <AlertCircle size={22} className="mx-auto mb-2" style={{ color: "#CBD5E1" }} />
-      <p className="font-semibold text-sm" style={{ color: "#0F172A" }}>
+      <AlertCircle size={22} className="mx-auto mb-2" style={{ color: "#6B7280" }} />
+      <p className="font-semibold text-sm" style={{ color: "#1E1E1E" }}>
         {title}
       </p>
-      <p className="text-xs mt-1 max-w-md mx-auto" style={{ color: "#64748B" }}>
+      <p className="text-xs mt-1 max-w-md mx-auto" style={{ color: "#4A4A4A" }}>
         {body}
       </p>
     </div>
