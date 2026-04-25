@@ -156,3 +156,13 @@ export type GoRealtimeEvent<T = unknown> = {
 };
 
 export type GoPresignResponse = { upload_url: string; public_url: string; key: string };
+
+export type GoSubscription = {
+  setup_fee_paid: boolean;
+  subscription_status: 'none' | 'active' | 'past_due' | 'canceled' | 'trialing';
+  current_period_end?: string;
+};
+
+export type GoCheckoutResult = {
+  url: string;
+};

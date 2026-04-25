@@ -3,6 +3,7 @@ import type {
   GoAdminUser,
   GoAuthResponse,
   GoCategory,
+  GoCheckoutResult,
   GoFinalizeResult,
   GoInvite,
   GoInviteWithShare,
@@ -11,6 +12,7 @@ import type {
   GoOrder,
   GoPresignResponse,
   GoRestaurant,
+  GoSubscription,
 } from './dto';
 
 export const authApi = {
@@ -110,6 +112,17 @@ export const invitesApi = {
 export const teamApi = {
   list: () => api.get<{ users: GoAdminUser[] }>('/api/admin/users'),
   del: (id: string) => api.del<void>(`/api/admin/users/${id}`),
+};
+
+export const billingApi = {
+  getSubscription: () =>
+    api.get<GoSubscription>('/api/billing/subscription'),
+  createSetupCheckout: (return_url: string) =>
+    api.post<GoCheckoutResult>('/api/billing/checkout/setup', { return_url }),
+  createSubscriptionCheckout: (return_url: string) =>
+    api.post<GoCheckoutResult>('/api/billing/checkout/subscription', { return_url }),
+  openPortal: (return_url: string) =>
+    api.post<GoCheckoutResult>('/api/billing/portal', { return_url }),
 };
 
 export const uploadsApi = {

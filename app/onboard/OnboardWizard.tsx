@@ -72,7 +72,7 @@ export default function OnboardWizard() {
 
         const completed = new Set(r.onboarding_completed_steps ?? []);
         if (completed.has("branding")) {
-          router.replace(STUDIO_HOME);
+          router.replace("/pricing");
           return;
         }
         if (!completed.has("restaurant")) setIndex(1);
@@ -107,8 +107,7 @@ export default function OnboardWizard() {
   const goNext = () => setIndex((i) => Math.min(i + 1, STEPS.length - 1));
   const goBack = () => setIndex((i) => Math.max(i - 1, 0));
   const finish = () => {
-    router.replace(STUDIO_HOME);
-    router.refresh();
+    router.replace("/pricing");
   };
 
   if (!ready) {

@@ -8,6 +8,7 @@ import {
   UtensilsCrossed,
   BarChart3,
   Settings,
+  CreditCard,
   Menu,
   X,
   ChevronUp,
@@ -19,6 +20,10 @@ import { STUDIO_HOME, studioPath } from "@/lib/studio";
 import { useStudioStore } from "@/lib/stores/studio.store";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import { useRestaurantStore } from "@/lib/stores/restaurant.store";
+import {
+  useSubscriptionStore,
+  isSubscriptionActive,
+} from "@/lib/stores/subscription.store";
 import FullScreenLoader from "@/app/_components/FullScreenLoader";
 import OpenClosedToggle from "./_components/OpenClosedToggle";
 
@@ -35,6 +40,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: studioPath("menu"), label: "Menu Management", icon: UtensilsCrossed },
   { href: studioPath("analytics"), label: "Analytics", icon: BarChart3 },
   { href: studioPath("settings"), label: "Settings", icon: Settings },
+  { href: studioPath("billing"), label: "Billing", icon: CreditCard },
 ];
 
 export default function StudioAppLayout({
@@ -56,6 +62,10 @@ export default function StudioAppLayout({
   const restaurant = useRestaurantStore((s) => s.restaurant);
   const fetchRestaurant = useRestaurantStore((s) => s.fetch);
 
+  const subscription = useSubscriptionStore((s) => s.subscription);
+  const subLoading = useSubscriptionStore((s) => s.loading);
+  const fetchSubscription = useSubscriptionStore((s) => s.fetch);
+
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
     Promise.resolve(useAuthStore.persist.rehydrate()).then(() =>
@@ -74,7 +84,11 @@ export default function StudioAppLayout({
       return;
     }
     if (!restaurant) void fetchRestaurant();
-  }, [hydrated, token, activeRestaurantId, restaurant, fetchRestaurant, router]);
+    if (!subscription && !subLoading) void fetchSubscription();
+    if (subscription && !isSubscriptionActive(subscription)) {
+      router.push("/pricing");
+    }
+  }, [hydrated, token, activeRestaurantId, restaurant, subscription, subLoading, fetchRestaurant, fetchSubscription, router]);
 
   const handleSignOut = async () => {
     await signout();
@@ -87,6 +101,14 @@ export default function StudioAppLayout({
   };
 
   if (!hydrated || !token || !activeRestaurantId) {
+    return <FullScreenLoader />;
+  }
+  // Show loader while subscription is being fetched for the first time
+  if (subLoading && !subscription) {
+    return <FullScreenLoader />;
+  }
+  // Prevent dashboard flash while redirect to /pricing is in flight
+  if (subscription && !isSubscriptionActive(subscription)) {
     return <FullScreenLoader />;
   }
 
