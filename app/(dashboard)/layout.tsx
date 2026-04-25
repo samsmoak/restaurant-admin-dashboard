@@ -73,22 +73,26 @@ export default function StudioAppLayout({
     );
   }, []);
 
+  // Auth + restaurant guard
   useEffect(() => {
     if (!hydrated) return;
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-    if (!activeRestaurantId) {
-      router.push("/onboard");
-      return;
-    }
+    if (!token) { router.push("/login"); return; }
+    if (!activeRestaurantId) { router.push("/onboard"); return; }
     if (!restaurant) void fetchRestaurant();
-    if (!subscription && !subLoading) void fetchSubscription();
+  }, [hydrated, token, activeRestaurantId, restaurant, fetchRestaurant, router]);
+
+  // Fetch subscription once when restaurant is confirmed — separate effect so
+  // the result (subscription=null on 404) never re-triggers this fetch.
+  useEffect(() => {
+    if (hydrated && activeRestaurantId) void fetchSubscription();
+  }, [hydrated, activeRestaurantId, fetchSubscription]);
+
+  // Redirect to pricing if subscription data says "not active"
+  useEffect(() => {
     if (subscription && !isSubscriptionActive(subscription)) {
       router.push("/pricing");
     }
-  }, [hydrated, token, activeRestaurantId, restaurant, subscription, subLoading, fetchRestaurant, fetchSubscription, router]);
+  }, [subscription, router]);
 
   const handleSignOut = async () => {
     await signout();
