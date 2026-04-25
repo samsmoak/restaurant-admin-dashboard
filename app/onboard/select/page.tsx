@@ -16,8 +16,13 @@ export default function SelectMembershipPage() {
   const activeRestaurantId = useAuthStore((s) => s.activeRestaurantId);
   const activate = useAuthStore((s) => s.activate);
   const signout = useAuthStore((s) => s.signout);
+  const refreshMemberships = useAuthStore((s) => s.refreshMemberships);
 
+  // Two-phase boot: 1) rehydrate localStorage (token), 2) re-fetch the
+  // membership list from the server so we never trust stale persisted entries
+  // (e.g., after a backend DB wipe or after a restaurant was deleted/renamed).
   const [hydrated, setHydrated] = useState(false);
+  const [refreshed, setRefreshed] = useState(false);
   const [activatingId, setActivatingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,6 +31,35 @@ export default function SelectMembershipPage() {
       setHydrated(true)
     );
   }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    let cancelled = false;
+    void (async () => {
+      // No token → routing effect below sends to /login. Skip the refresh.
+      if (!useAuthStore.getState().token) {
+        if (!cancelled) setRefreshed(true);
+        return;
+      }
+      try {
+        await refreshMemberships();
+      } catch (e) {
+        // 401 is handled globally (clears token + redirects). For other errors
+        // we fall through and use whatever persisted memberships we have plus
+        // show an inline message.
+        if (!cancelled && !(isApiError(e) && e.status === 401)) {
+          setError(isApiError(e) ? e.error : "Could not refresh restaurants.");
+        }
+      } finally {
+        if (!cancelled) setRefreshed(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, refreshMemberships]);
+
+  const ready = hydrated && refreshed;
 
   // De-duplicate memberships by restaurant_id. The backend can return the same
   // (user, restaurant) pair multiple times if the memberships table has
@@ -43,9 +77,9 @@ export default function SelectMembershipPage() {
     return Array.from(byId.values());
   }, [memberships]);
 
-  // Routing decisions once hydrated.
+  // Routing decisions once hydrated AND the server-side refresh has settled.
   useEffect(() => {
-    if (!hydrated) return;
+    if (!ready) return;
 
     if (!token) {
       router.replace("/login");
@@ -78,16 +112,16 @@ export default function SelectMembershipPage() {
         }
       })();
     }
-  }, [hydrated, token, uniqueMemberships, activeRestaurantId, activate, signout, router]);
+  }, [ready, token, uniqueMemberships, activeRestaurantId, activate, signout, router]);
 
   const showChooser = useMemo(() => {
     return (
-      hydrated &&
+      ready &&
       !!token &&
       uniqueMemberships.length > 1 &&
       !activeRestaurantId
     );
-  }, [hydrated, token, uniqueMemberships.length, activeRestaurantId]);
+  }, [ready, token, uniqueMemberships.length, activeRestaurantId]);
 
   const onPick = async (restaurantId: string) => {
     setError(null);

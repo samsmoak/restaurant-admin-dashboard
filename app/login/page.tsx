@@ -6,6 +6,7 @@ import { ChevronLeft, Mail } from "lucide-react";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import { isApiError } from "@/lib/api/client";
 import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
+import NoMembershipCTA from "@/components/auth/NoMembershipCTA";
 import { STUDIO_HOME } from "@/lib/studio";
 import FullScreenLoader from "@/app/_components/FullScreenLoader";
 
@@ -35,6 +36,7 @@ function LoginInner() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string>(initialError ?? "");
   const [loading, setLoading] = useState(false);
+  const [noMembership, setNoMembership] = useState(false);
 
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
@@ -53,25 +55,30 @@ function LoginInner() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setNoMembership(false);
     setLoading(true);
 
     try {
       await login(email, password);
-      const { memberships, activeRestaurantId, signout } = useAuthStore.getState();
+      const { memberships, activeRestaurantId } = useAuthStore.getState();
       if (memberships.length === 0) {
-        await signout();
-        setError(
-          "This account is not a restaurant admin. Ask your owner for an invite."
-        );
+        // Keep the session token so /onboard can resume at StepRestaurant
+        // instead of dead-ending on StepAccount (which would 409 on the same
+        // email). The "Try a different one" reset below is responsible for
+        // signing out if the user actually wants a different account.
+        setNoMembership(true);
         setLoading(false);
         return;
       }
+      // Hard navigation (window.location) instead of router.push to avoid a
+      // race between the SPA navigation and this page's loader-gate render
+      // (which kicks in the moment `token && activeRestaurantId` becomes
+      // truthy in the store).
       if (!activeRestaurantId && memberships.length > 1) {
-        router.push("/onboard/select");
+        window.location.assign("/onboard/select");
         return;
       }
-      router.push(STUDIO_HOME);
-      router.refresh();
+      window.location.assign(STUDIO_HOME);
     } catch (e) {
       setError(isApiError(e) ? e.error : "An unexpected error occurred");
       setLoading(false);
@@ -109,7 +116,7 @@ function LoginInner() {
           </p>
         </div>
 
-        {error && (
+        {error && !noMembership && (
           <div
             className="text-sm px-3.5 py-2.5 mb-4"
             style={{
@@ -123,7 +130,18 @@ function LoginInner() {
           </div>
         )}
 
-        {mode === "choose" ? (
+        {noMembership ? (
+          <NoMembershipCTA
+            onTryAgain={async () => {
+              await useAuthStore.getState().signout();
+              setNoMembership(false);
+              setError("");
+              setEmail("");
+              setPassword("");
+              setMode("choose");
+            }}
+          />
+        ) : mode === "choose" ? (
           <div className="space-y-3">
             <GoogleAuthButton next={STUDIO_HOME} />
 

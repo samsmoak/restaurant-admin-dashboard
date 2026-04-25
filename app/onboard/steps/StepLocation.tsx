@@ -2,12 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MapPin, CheckCircle2, Loader2 } from "lucide-react";
-import { useJsApiLoader } from "@react-google-maps/api";
 import { useRestaurantStore } from "@/lib/stores/restaurant.store";
 import { isApiError } from "@/lib/api/client";
 import StepShell from "../_components/StepShell";
-
-const LIBRARIES: ("places")[] = ["places"];
 
 type Selected = {
   formatted_address: string;
@@ -25,13 +22,12 @@ type SuggestionRow = {
 /**
  * Wizard step 3 — location.
  *
- * Uses the NEW Places Autocomplete API (`AutocompleteSuggestion` /
- * `Place.fetchFields`), which works on both legacy and "Places API (New)"
- * projects. The old `AutocompleteService` + `PlacesService` classes are
- * unavailable for new GCP projects created after March 2025.
- *
- * If the new API isn't on the Maps library bundle we received, we fall back
- * to the old one so older projects still work.
+ * Talks to the Places API (New) REST endpoints directly with fetch + an API
+ * key in the `X-Goog-Api-Key` header. We deliberately avoid the JS Maps SDK
+ * (`@react-google-maps/api` / `useJsApiLoader`) because the SDK adds a heavy
+ * runtime, requires HTTP-referrer-restricted keys, and depends on the
+ * `AutocompleteSuggestion` class which silently fails on some GCP projects.
+ * The same REST flow already powers the customer-side Flutter app.
  */
 export default function StepLocation({
   onDone,
@@ -43,10 +39,6 @@ export default function StepLocation({
   initial?: Partial<Selected>;
 }) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: apiKey,
-    libraries: LIBRARIES,
-  });
 
   const update = useRestaurantStore((s) => s.update);
 
@@ -68,51 +60,56 @@ export default function StepLocation({
   const [error, setError] = useState<string | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
 
-  // Session token for cost optimization — one token per autocomplete session.
-  const sessionTokenRef = useRef<unknown>(null);
-  useEffect(() => {
-    if (!isLoaded) return;
-    const g = google as unknown as {
-      maps: { places: { AutocompleteSessionToken: new () => unknown } };
-    };
-    sessionTokenRef.current = new g.maps.places.AutocompleteSessionToken();
-  }, [isLoaded]);
+  // Session token for cost optimization — a fresh UUID per autocomplete
+  // session, regenerated after each successful selection. Plain string is all
+  // the REST API needs.
+  const sessionTokenRef = useRef<string>(newSessionToken());
 
-  // Debounced fetch as the user types.
+  // Debounced fetch as the user types. All state changes happen inside the
+  // deferred timer body so the effect itself never calls setState
+  // synchronously.
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!apiKey) return;
     const text = query.trim();
-    if (text.length < 2 || (selected && text === selected.formatted_address)) {
-      setSuggestions([]);
-      setShowDropdown(false);
-      setSearchError(null);
-      return;
-    }
-    setSearching(true);
-    const handle = setTimeout(async () => {
-      try {
-        const rows = await fetchSuggestions(text, sessionTokenRef.current);
-        setSuggestions(rows);
-        setShowDropdown(true);
+    let cancelled = false;
+    const handle = window.setTimeout(async () => {
+      if (cancelled) return;
+      if (text.length < 2 || (selected && text === selected.formatted_address)) {
+        setSuggestions([]);
+        setShowDropdown(false);
         setSearchError(null);
+        return;
+      }
+      setSearching(true);
+      try {
+        const rows = await fetchSuggestions(text, sessionTokenRef.current, apiKey);
+        if (cancelled) return;
+        setSuggestions(rows);
+        setShowDropdown(rows.length > 0);
+        setSearchError(rows.length === 0 ? "No matches found." : null);
       } catch (err) {
+        if (cancelled) return;
         console.error("[places] fetchSuggestions failed:", err);
         setSuggestions([]);
+        setShowDropdown(false);
         setSearchError(
           err instanceof Error ? err.message : "Address search failed."
         );
       } finally {
-        setSearching(false);
+        if (!cancelled) setSearching(false);
       }
-    }, 200);
-    return () => clearTimeout(handle);
-  }, [query, isLoaded, selected]);
+    }, 250);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(handle);
+    };
+  }, [query, apiKey, selected]);
 
   const pickSuggestion = async (row: SuggestionRow) => {
     setShowDropdown(false);
     setSearching(true);
     try {
-      const place = await fetchPlaceDetails(row.placeId, sessionTokenRef.current);
+      const place = await fetchPlaceDetails(row.placeId, apiKey);
       const sel: Selected = {
         formatted_address: place.formatted_address || row.mainText,
         latitude: place.latitude,
@@ -124,10 +121,7 @@ export default function StepLocation({
       setError(null);
       setSearchError(null);
       // Start a fresh session token for the next search.
-      const g = google as unknown as {
-        maps: { places: { AutocompleteSessionToken: new () => unknown } };
-      };
-      sessionTokenRef.current = new g.maps.places.AutocompleteSessionToken();
+      sessionTokenRef.current = newSessionToken();
     } catch (err) {
       console.error("[places] fetchPlaceDetails failed:", err);
       setError(
@@ -179,7 +173,7 @@ export default function StepLocation({
     }
   };
 
-  const placesUnavailable = !apiKey || !!loadError;
+  const placesUnavailable = !apiKey;
 
   return (
     <StepShell
@@ -195,7 +189,7 @@ export default function StepLocation({
         <button
           form="step-location"
           type="submit"
-          disabled={submitting || !!error || !!loadError}
+          disabled={submitting || !!error}
           className="inline-flex items-center justify-center px-5 py-2 font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
           style={{
             backgroundColor: "#0F2B4D",
@@ -222,7 +216,7 @@ export default function StepLocation({
         </div>
       )}
 
-      {loadError && (
+      {placesUnavailable && (
         <div
           className="text-xs px-3.5 py-2.5"
           style={{
@@ -232,8 +226,9 @@ export default function StepLocation({
             borderRadius: 4,
           }}
         >
-          Google Maps couldn&apos;t load. You can still type your address — we&apos;ll
-          skip coordinates for now and refine later from Settings.
+          Address autocomplete is unavailable (missing API key). You can still
+          type your full address — we&apos;ll skip coordinates for now and
+          refine them later from Settings.
         </div>
       )}
 
@@ -382,144 +377,95 @@ export default function StepLocation({
   );
 }
 
-/* ─── Places API helpers ──────────────────────────────────────────────── */
+/* ─── Places API (New) — REST helpers ─────────────────────────────────── */
 
-// Narrow cast to skirt the missing typings for the new Places API classes.
-type GMaps = typeof google & {
-  maps: typeof google.maps & {
-    places: typeof google.maps.places & {
-      AutocompleteSuggestion?: {
-        fetchAutocompleteSuggestions: (req: {
-          input: string;
-          sessionToken?: unknown;
-        }) => Promise<{ suggestions: NewSuggestion[] }>;
+const PLACES_BASE = "https://places.googleapis.com/v1";
+
+function newSessionToken(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  // Cheap fallback for older browsers.
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+type AutocompleteResponse = {
+  suggestions?: Array<{
+    placePrediction?: {
+      placeId: string;
+      text?: { text?: string };
+      structuredFormat?: {
+        mainText?: { text?: string };
+        secondaryText?: { text?: string };
       };
-      Place?: new (opts: { id: string; requestedLanguage?: string }) => NewPlace;
     };
-  };
+  }>;
 };
 
-type NewSuggestion = {
-  placePrediction: {
-    placeId: string;
-    text: { text: string };
-    mainText?: { text: string };
-    secondaryText?: { text: string };
-    toPlace: () => NewPlace;
-  } | null;
-};
-
-type NewPlace = {
-  id: string;
+type PlaceDetailsResponse = {
+  id?: string;
   formattedAddress?: string;
-  location?: { lat: () => number; lng: () => number };
-  fetchFields: (req: { fields: string[] }) => Promise<{ place: NewPlace }>;
+  location?: { latitude?: number; longitude?: number };
 };
 
 async function fetchSuggestions(
   input: string,
-  sessionToken: unknown
+  sessionToken: string,
+  apiKey: string
 ): Promise<SuggestionRow[]> {
-  const g = (google as unknown) as GMaps;
-
-  // Try NEW API first.
-  const NewSuggestionAPI = g.maps.places.AutocompleteSuggestion;
-  if (NewSuggestionAPI) {
-    const { suggestions } = await NewSuggestionAPI.fetchAutocompleteSuggestions({
-      input,
-      sessionToken,
-    });
-    const rows: SuggestionRow[] = [];
-    for (const s of suggestions) {
-      const pred = s.placePrediction;
-      if (!pred) continue;
-      rows.push({
-        placeId: pred.placeId,
-        mainText: pred.mainText?.text ?? pred.text.text,
-        secondaryText: pred.secondaryText?.text ?? "",
-      });
-    }
-    return rows;
-  }
-
-  // Fall back to legacy AutocompleteService.
-  return new Promise((resolve, reject) => {
-    const svc = new google.maps.places.AutocompleteService();
-    svc.getPlacePredictions(
-      {
-        input,
-        sessionToken: sessionToken as google.maps.places.AutocompleteSessionToken | undefined,
-      },
-      (results, status) => {
-        if (
-          status !== google.maps.places.PlacesServiceStatus.OK &&
-          status !== google.maps.places.PlacesServiceStatus.ZERO_RESULTS
-        ) {
-          return reject(new Error(`Places legacy API status: ${status}`));
-        }
-        resolve(
-          (results ?? []).map((p) => ({
-            placeId: p.place_id,
-            mainText: p.structured_formatting?.main_text ?? p.description,
-            secondaryText: p.structured_formatting?.secondary_text ?? "",
-          }))
-        );
-      }
-    );
+  const res = await fetch(`${PLACES_BASE}/places:autocomplete`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": apiKey,
+    },
+    body: JSON.stringify({ input, sessionToken }),
   });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Places autocomplete ${res.status}: ${body || res.statusText}`);
+  }
+  const data = (await res.json()) as AutocompleteResponse;
+  const rows: SuggestionRow[] = [];
+  for (const s of data.suggestions ?? []) {
+    const p = s.placePrediction;
+    if (!p) continue;
+    const main = p.structuredFormat?.mainText?.text ?? p.text?.text ?? "";
+    const secondary = p.structuredFormat?.secondaryText?.text ?? "";
+    rows.push({
+      placeId: p.placeId,
+      mainText: main,
+      secondaryText: secondary,
+    });
+  }
+  return rows;
 }
 
 async function fetchPlaceDetails(
   placeId: string,
-  sessionToken: unknown
+  apiKey: string
 ): Promise<{
   place_id: string;
   formatted_address: string;
   latitude: number;
   longitude: number;
 }> {
-  const g = (google as unknown) as GMaps;
-
-  // Try NEW API first.
-  const NewPlaceCtor = g.maps.places.Place;
-  if (NewPlaceCtor) {
-    const place = new NewPlaceCtor({ id: placeId });
-    await place.fetchFields({ fields: ["formattedAddress", "location", "id"] });
-    const lat = place.location?.lat?.() ?? 0;
-    const lng = place.location?.lng?.() ?? 0;
-    return {
-      place_id: place.id ?? placeId,
-      formatted_address: place.formattedAddress ?? "",
-      latitude: lat,
-      longitude: lng,
-    };
-  }
-
-  // Legacy fallback via PlacesService.
-  return new Promise((resolve, reject) => {
-    const anchor = document.createElement("div");
-    const svc = new google.maps.places.PlacesService(anchor);
-    svc.getDetails(
-      {
-        placeId,
-        fields: ["formatted_address", "geometry", "place_id"],
-        sessionToken: sessionToken as google.maps.places.AutocompleteSessionToken | undefined,
-      },
-      (place, status) => {
-        if (
-          status !== google.maps.places.PlacesServiceStatus.OK ||
-          !place ||
-          !place.geometry?.location
-        ) {
-          return reject(new Error(`PlacesService status: ${status}`));
-        }
-        resolve({
-          place_id: place.place_id ?? placeId,
-          formatted_address: place.formatted_address ?? "",
-          latitude: place.geometry.location.lat(),
-          longitude: place.geometry.location.lng(),
-        });
-      }
-    );
+  const res = await fetch(`${PLACES_BASE}/places/${encodeURIComponent(placeId)}`, {
+    method: "GET",
+    headers: {
+      "X-Goog-Api-Key": apiKey,
+      "X-Goog-FieldMask": "id,formattedAddress,location",
+    },
   });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Place details ${res.status}: ${body || res.statusText}`);
+  }
+  const data = (await res.json()) as PlaceDetailsResponse;
+  return {
+    place_id: data.id ?? placeId,
+    formatted_address: data.formattedAddress ?? "",
+    latitude: data.location?.latitude ?? 0,
+    longitude: data.location?.longitude ?? 0,
+  };
 }

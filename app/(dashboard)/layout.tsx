@@ -10,7 +10,6 @@ import {
   Settings,
   Menu,
   X,
-  UserPlus,
   ChevronUp,
   LogOut,
   type LucideIcon,
@@ -35,7 +34,6 @@ const NAV_ITEMS: NavItem[] = [
   { href: studioPath("history"), label: "Order History", icon: FolderOpen },
   { href: studioPath("menu"), label: "Menu Management", icon: UtensilsCrossed },
   { href: studioPath("analytics"), label: "Analytics", icon: BarChart3 },
-  { href: studioPath("team"), label: "Team", icon: UserPlus },
   { href: studioPath("settings"), label: "Settings", icon: Settings },
 ];
 

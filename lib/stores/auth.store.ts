@@ -9,7 +9,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { setStoredToken, getStoredToken, isApiError, setUnauthorizedHandler } from '@/lib/api/client';
+import { setStoredToken, isApiError, setUnauthorizedHandler } from '@/lib/api/client';
 import { authApi } from '@/lib/api/endpoints';
 import type { GoAuthResponse, GoFinalizeResult, GoMembership, GoUser } from '@/lib/api/dto';
 
@@ -28,6 +28,7 @@ type AuthState = {
   finalize: (invite_code: string) => Promise<GoFinalizeResult>;
   activate: (restaurant_id: string) => Promise<void>;
   signout: () => Promise<void>;
+  refreshMemberships: () => Promise<GoMembership[]>;
   hydrate: () => void;
 };
 
@@ -37,6 +38,13 @@ function applyBase(set: (p: Partial<AuthState>) => void, resp: GoAuthResponse) {
     token: resp.token,
     user: resp.user,
     memberships: resp.memberships,
+    // Always reset activation when applying a fresh base token (login / signup
+    // / google). The caller's auto-activate path will set these again if there
+    // is exactly one membership; otherwise the chooser has to re-pick. This
+    // prevents a stale activeRestaurantId from a previous session leaking
+    // into a new login and pointing at a deleted restaurant.
+    activeRestaurantId: null,
+    activeRole: null,
     loading: false,
     error: null,
   });
@@ -144,6 +152,12 @@ export const useAuthStore = create<AuthState>()(
           activeRestaurantId: null,
           activeRole: null,
         });
+      },
+
+      async refreshMemberships() {
+        const { memberships } = await authApi.memberships();
+        set({ memberships });
+        return memberships;
       },
 
       hydrate() {

@@ -37,6 +37,7 @@ export default function StepAccount({ onDone }: { onDone: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [emailExists, setEmailExists] = useState(false);
   const [emailChecking, setEmailChecking] = useState(false);
+  const [registeredAs, setRegisteredAs] = useState<'admin' | 'customer' | null>(null);
 
   const emailInputRef = useRef<HTMLInputElement>(null);
   // Tracks the most recent in-flight check so older results can be discarded.
@@ -50,6 +51,7 @@ export default function StepAccount({ onDone }: { onDone: () => void }) {
     setError(null);
     setEmailExists(false);
     setEmailChecking(false);
+    setRegisteredAs(null);
   };
 
   // Debounced background check while the user types. All state changes happen
@@ -72,9 +74,20 @@ export default function StepAccount({ onDone }: { onDone: () => void }) {
         const res = await authApi.checkEmailAvailable(trimmed);
         if (seq !== checkSeqRef.current) return;
         setEmailExists(!res.available);
+        setRegisteredAs(res.registered_as ?? null);
         setError((prev) => {
-          if (!res.available) return "An account with this email already exists.";
-          if (prev === "An account with this email already exists.") return null;
+          if (!res.available) {
+            if (res.registered_as === "customer") {
+              return "This email is registered as a customer account. Please use a different email to create your restaurant.";
+            }
+            return "An account with this email already exists.";
+          }
+          if (
+            prev === "An account with this email already exists." ||
+            prev?.includes("This email is registered as a customer account")
+          ) {
+            return null;
+          }
           return prev;
         });
       } catch {
@@ -106,7 +119,12 @@ export default function StepAccount({ onDone }: { onDone: () => void }) {
         const res = await authApi.checkEmailAvailable(emailTrim);
         if (!res.available) {
           setEmailExists(true);
-          setError("An account with this email already exists.");
+          setRegisteredAs(res.registered_as ?? null);
+          const msg =
+            res.registered_as === "customer"
+              ? "This email is registered as a customer account. Please use a different email to create your restaurant."
+              : "An account with this email already exists.";
+          setError(msg);
           setSubmitting(false);
           emailInputRef.current?.focus();
           return;
@@ -219,7 +237,7 @@ export default function StepAccount({ onDone }: { onDone: () => void }) {
                 }}
               >
                 <p className="font-medium">{error}</p>
-                {emailExists && (
+                {emailExists && registeredAs === "admin" && (
                   <p className="text-xs mt-1.5" style={{ color: "#7F1D1D" }}>
                     Already have an account?{" "}
                     <a
@@ -263,7 +281,11 @@ export default function StepAccount({ onDone }: { onDone: () => void }) {
                     setEmail(e.target.value);
                     if (emailExists) {
                       setEmailExists(false);
-                      if (error === "An account with this email already exists.") {
+                      setRegisteredAs(null);
+                      if (
+                        error === "An account with this email already exists." ||
+                        error?.includes("This email is registered as a customer account")
+                      ) {
                         setError(null);
                       }
                     }

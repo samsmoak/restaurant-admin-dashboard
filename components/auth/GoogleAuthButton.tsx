@@ -7,10 +7,10 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import { isApiError } from "@/lib/api/client";
+import NoMembershipCTA from "@/components/auth/NoMembershipCTA";
 
 type Props = { next: string; label?: string };
 type GISCredentialResponse = { credential: string };
@@ -34,9 +34,9 @@ function getGISAccounts(): GISAccountsId | null {
 }
 
 export default function GoogleAuthButton({ next, label }: Props) {
-  const router = useRouter();
   const signIn = useAuthStore((s) => s.signInWithGoogle);
   const [error, setError] = useState<string | null>(null);
+  const [noMembership, setNoMembership] = useState(false);
   const [ready, setReady] = useState(false);
   const buttonRef = useRef<HTMLDivElement>(null);
 
@@ -52,19 +52,23 @@ export default function GoogleAuthButton({ next, label }: Props) {
       callback: async (resp: GISCredentialResponse) => {
         if (!resp?.credential) return;
         setError(null);
+        setNoMembership(false);
         try {
           await signIn(resp.credential);
           const { memberships, activeRestaurantId } = useAuthStore.getState();
-          if (memberships.length === 0) {
-            setError("This account is not a restaurant admin.");
+          // On the signup wizard (next === "/onboard"), having zero memberships
+          // is the expected state — the user is in the middle of creating one.
+          // Just advance the wizard by reloading /onboard so its init effect
+          // sees the new token and moves to step 2 (Restaurant).
+          if (memberships.length === 0 && next !== "/onboard") {
+            setNoMembership(true);
             return;
           }
           if (!activeRestaurantId && memberships.length > 1) {
-            router.push("/onboard/select");
+            window.location.assign("/onboard/select");
             return;
           }
-          router.push(next);
-          router.refresh();
+          window.location.assign(next);
         } catch (e) {
           setError(isApiError(e) ? e.error : "Google sign-in failed");
         }
@@ -82,7 +86,7 @@ export default function GoogleAuthButton({ next, label }: Props) {
         width: buttonRef.current.offsetWidth || 320,
       });
     }
-  }, [clientId, ready, label, next, router, signIn]);
+  }, [clientId, ready, label, next, signIn]);
 
   if (!clientId) {
     return (
@@ -109,19 +113,31 @@ export default function GoogleAuthButton({ next, label }: Props) {
         strategy="afterInteractive"
         onReady={() => setReady(true)}
       />
-      {error && (
-        <div
-          className="text-sm px-4 py-2.5"
-          style={{
-            backgroundColor: "#FEF2F2",
-            color: "#DC2626",
-            border: "1px solid #DC2626",
+      {noMembership ? (
+        <NoMembershipCTA
+          variant="inline"
+          onTryAgain={async () => {
+            await useAuthStore.getState().signout();
+            setNoMembership(false);
           }}
-        >
-          {error}
-        </div>
+        />
+      ) : (
+        <>
+          {error && (
+            <div
+              className="text-sm px-4 py-2.5"
+              style={{
+                backgroundColor: "#FEF2F2",
+                color: "#DC2626",
+                border: "1px solid #DC2626",
+              }}
+            >
+              {error}
+            </div>
+          )}
+          <div ref={buttonRef} className="flex justify-center" />
+        </>
       )}
-      <div ref={buttonRef} className="flex justify-center" />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { useUploadsStore } from "@/lib/stores/uploads.store";
 import { isApiError } from "@/lib/api/client";
 import { Switch } from "@/components/ui/switch";
 import OpenClosedToggle from "../_components/OpenClosedToggle";
+import LocationPicker, { type LocationValue } from "@/components/location/LocationPicker";
 import type { GoRestaurant } from "@/lib/api/dto";
 
 type OpeningHours = GoRestaurant["opening_hours"];
@@ -36,7 +37,6 @@ export default function SettingsForm({
   const [form, setForm] = useState({
     name: settings.name ?? "",
     phone: settings.phone ?? "",
-    address: settings.address ?? "",
     delivery_fee: String(settings.delivery_fee ?? 0),
     min_order_amount: String(settings.min_order_amount ?? 0),
     estimated_pickup_time: String(settings.estimated_pickup_time ?? 20),
@@ -46,6 +46,16 @@ export default function SettingsForm({
   const [logoUrl, setLogoUrl] = useState<string | null>(settings.logo_url ?? null);
   const [hours, setHours] = useState<OpeningHours>(
     (settings.opening_hours as OpeningHours) ?? {}
+  );
+  const [location, setLocation] = useState<LocationValue | null>(
+    settings.formatted_address
+      ? {
+          formatted_address: settings.formatted_address,
+          latitude: settings.latitude ?? 0,
+          longitude: settings.longitude ?? 0,
+          place_id: settings.place_id ?? "",
+        }
+      : null
   );
 
   const updateText =
@@ -91,7 +101,7 @@ export default function SettingsForm({
         name: form.name.trim() || "My Restaurant",
         logo_url: publicUrl,
         phone: form.phone.trim(),
-        formatted_address: form.address.trim(),
+        ...locationPatch(location),
         delivery_fee: Number(form.delivery_fee) || 0,
         min_order_amount: Number(form.min_order_amount) || 0,
         estimated_pickup_time: Number(form.estimated_pickup_time) || 20,
@@ -116,7 +126,7 @@ export default function SettingsForm({
         name: form.name.trim() || "My Restaurant",
         logo_url: "",
         phone: form.phone.trim(),
-        formatted_address: form.address.trim(),
+        ...locationPatch(location),
         delivery_fee: Number(form.delivery_fee) || 0,
         min_order_amount: Number(form.min_order_amount) || 0,
         estimated_pickup_time: Number(form.estimated_pickup_time) || 20,
@@ -142,7 +152,7 @@ export default function SettingsForm({
         name: form.name.trim() || "My Restaurant",
         logo_url: logoUrl ?? "",
         phone: form.phone.trim(),
-        formatted_address: form.address.trim(),
+        ...locationPatch(location),
         delivery_fee: Number(form.delivery_fee) || 0,
         min_order_amount: Number(form.min_order_amount) || 0,
         estimated_pickup_time: Number(form.estimated_pickup_time) || 20,
@@ -242,15 +252,6 @@ export default function SettingsForm({
               placeholder="(555) 123-4567"
             />
           </StudioField>
-          <StudioField label="Address" fullWidth>
-            <input
-              type="text"
-              value={form.address}
-              onChange={updateText("address")}
-              className="studio-input"
-              placeholder="123 Main St, Springfield"
-            />
-          </StudioField>
           <StudioField label="Currency">
             <select
               value={form.currency}
@@ -265,6 +266,14 @@ export default function SettingsForm({
             </select>
           </StudioField>
         </div>
+      </Section>
+
+      {/* Location */}
+      <Section
+        title="Location"
+        description="Used for delivery distance and showing your address to customers. Search and pick to update — coordinates are saved automatically."
+      >
+        <LocationPicker value={location} onChange={setLocation} />
       </Section>
 
       {/* Ordering */}
@@ -458,6 +467,16 @@ export default function SettingsForm({
       `}</style>
     </form>
   );
+}
+
+function locationPatch(loc: LocationValue | null) {
+  if (!loc) return {};
+  return {
+    formatted_address: loc.formatted_address,
+    latitude: loc.latitude,
+    longitude: loc.longitude,
+    place_id: loc.place_id,
+  };
 }
 
 function Section({
