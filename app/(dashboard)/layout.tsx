@@ -87,12 +87,14 @@ export default function StudioAppLayout({
     if (hydrated && activeRestaurantId) void fetchSubscription();
   }, [hydrated, activeRestaurantId, fetchSubscription]);
 
-  // Redirect to pricing if subscription data says "not active"
+  // Redirect to pricing if subscription data says "not active".
+  // /billing and /settings are exempt — accessible without an active subscription.
   useEffect(() => {
-    if (subscription && !isSubscriptionActive(subscription)) {
+    const exempt = pathname.startsWith("/billing") || pathname.startsWith("/settings");
+    if (!exempt && subscription && !isSubscriptionActive(subscription)) {
       router.push("/pricing");
     }
-  }, [subscription, router]);
+  }, [subscription, pathname, router]);
 
   const handleSignOut = async () => {
     await signout();
@@ -107,12 +109,13 @@ export default function StudioAppLayout({
   if (!hydrated || !token || !activeRestaurantId) {
     return <FullScreenLoader />;
   }
-  // Show loader while subscription is being fetched for the first time
-  if (subLoading && !subscription) {
+  const exemptFromGate = pathname.startsWith("/billing") || pathname.startsWith("/settings");
+  // Show loader while subscription is being fetched on gated pages
+  if (!exemptFromGate && subLoading && !subscription) {
     return <FullScreenLoader />;
   }
   // Prevent dashboard flash while redirect to /pricing is in flight
-  if (subscription && !isSubscriptionActive(subscription)) {
+  if (!exemptFromGate && subscription && !isSubscriptionActive(subscription)) {
     return <FullScreenLoader />;
   }
 

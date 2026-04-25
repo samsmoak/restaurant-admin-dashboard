@@ -77,9 +77,12 @@ export default function BillingPage() {
   const [portalLoading, setPortalLoading] = useState(false);
   const [portalError, setPortalError] = useState<string | null>(null);
 
+  // Subscription data is already fetched by the dashboard layout.
+  // We only re-fetch here if the store has no data yet (e.g. direct navigation).
   useEffect(() => {
-    void fetchSubscription();
-  }, [fetchSubscription]);
+    if (!subscription && !loading) void fetchSubscription();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentionally runs once on mount
 
   const handlePortal = async () => {
     setPortalError(null);
