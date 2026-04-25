@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Loader2, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { Check, Loader2, ChevronRight, ArrowLeft } from "lucide-react";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import {
   useSubscriptionStore,
@@ -95,6 +96,18 @@ export default function PricingPage() {
       className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
       style={{ backgroundColor: "#F5F7FA" }}
     >
+      {/* Back to billing */}
+      <div className="w-full max-w-lg mb-4">
+        <Link
+          href="/billing"
+          className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors hover:opacity-70"
+          style={{ color: "#0F2B4D" }}
+        >
+          <ArrowLeft size={15} />
+          Back to billing
+        </Link>
+      </div>
+
       {/* Logo / header */}
       <div className="flex items-center gap-3 mb-10">
         <div

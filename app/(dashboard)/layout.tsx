@@ -92,7 +92,7 @@ export default function StudioAppLayout({
   useEffect(() => {
     const exempt = pathname.startsWith("/billing") || pathname.startsWith("/settings");
     if (!exempt && subscription && !isSubscriptionActive(subscription)) {
-      router.push("/pricing");
+      router.push("/billing");
     }
   }, [subscription, pathname, router]);
 
@@ -116,7 +116,7 @@ export default function StudioAppLayout({
   }
   // Prevent dashboard flash while redirect to /pricing is in flight
   if (!exemptFromGate && subscription && !isSubscriptionActive(subscription)) {
-    return <FullScreenLoader />;
+    return <FullScreenLoader />; // brief blank while router.push("/billing") lands
   }
 
   const isActive = (href: string, exact?: boolean) =>
