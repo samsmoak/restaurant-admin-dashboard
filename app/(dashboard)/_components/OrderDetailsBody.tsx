@@ -13,6 +13,7 @@ const STATUS_COLORS: Record<OrderStatus, { bg: string; fg: string }> = {
   preparing: { bg: "#DBEAFE", fg: "#1E40AF" },
   ready: { bg: "#D1FAE5", fg: "#065F46" },
   completed: { bg: "#E5E7EB", fg: "#374151" },
+  delivered: { bg: "#CFFAFE", fg: "#0E7490" },
   cancelled: { bg: "#FEE2E2", fg: "#991B1B" },
 };
 

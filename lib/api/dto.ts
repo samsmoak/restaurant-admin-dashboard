@@ -56,7 +56,7 @@ export type GoCategory = {
   created_at: string;
 };
 
-export type GoOrderStatus = 'new' | 'preparing' | 'ready' | 'completed' | 'cancelled';
+export type GoOrderStatus = 'new' | 'preparing' | 'ready' | 'completed' | 'delivered' | 'cancelled';
 export type GoOrderType = 'pickup' | 'delivery';
 export type GoPaymentStatus = 'pending' | 'paid' | 'failed';
 

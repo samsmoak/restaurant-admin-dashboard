@@ -8,6 +8,7 @@ import {
   Check,
   Flame,
   PackageCheck,
+  Truck,
   X,
 } from "lucide-react";
 import { useOrdersStore } from "@/lib/stores/orders.store";
@@ -99,6 +100,7 @@ export default function LiveOrdersPage() {
     preparing: orders.filter((o) => o.status === "preparing"),
     ready: orders.filter((o) => o.status === "ready"),
     completed: [],
+    delivered: [],
     cancelled: [],
   };
 
@@ -246,15 +248,27 @@ function OrderCard({
           </Button>
         )}
         {order.status === "ready" && (
-          <Button
-            size="sm"
-            className="w-full gap-1.5"
-            onClick={() => onAdvance(order.id, "completed")}
-            style={{ backgroundColor: "#0F2B4D", color: "#FFFFFF" }}
-          >
-            <Check size={13} />
-            Complete
-          </Button>
+          order.order_type === "delivery" ? (
+            <Button
+              size="sm"
+              className="w-full gap-1.5"
+              onClick={() => onAdvance(order.id, "delivered")}
+              style={{ backgroundColor: "#0E7490", color: "#FFFFFF" }}
+            >
+              <Truck size={13} />
+              Mark as Delivered
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              className="w-full gap-1.5"
+              onClick={() => onAdvance(order.id, "completed")}
+              style={{ backgroundColor: "#0F2B4D", color: "#FFFFFF" }}
+            >
+              <Check size={13} />
+              Complete
+            </Button>
+          )
         )}
       </div>
     </article>
