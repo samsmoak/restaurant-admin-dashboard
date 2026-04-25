@@ -116,13 +116,13 @@ export const teamApi = {
 
 export const billingApi = {
   getSubscription: () =>
-    api.get<GoSubscription>('/api/billing/subscription'),
+    api.get<GoSubscription>('/api/admin/billing/subscription'),
   createSetupCheckout: (return_url: string) =>
-    api.post<GoCheckoutResult>('/api/billing/checkout/setup', { return_url }),
+    api.post<GoCheckoutResult>('/api/admin/billing/checkout/setup', { return_url }),
   createSubscriptionCheckout: (return_url: string) =>
-    api.post<GoCheckoutResult>('/api/billing/checkout/subscription', { return_url }),
+    api.post<GoCheckoutResult>('/api/admin/billing/checkout/subscription', { return_url }),
   openPortal: (return_url: string) =>
-    api.post<GoCheckoutResult>('/api/billing/portal', { return_url }),
+    api.post<GoCheckoutResult>('/api/admin/billing/portal', { return_url }),
 };
 
 export const uploadsApi = {

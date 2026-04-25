@@ -6,7 +6,7 @@ import { isApiError } from '@/lib/api/client';
 import type { GoSubscription } from '@/lib/api/dto';
 
 export function isSubscriptionActive(s: GoSubscription): boolean {
-  return s.setup_fee_paid && s.subscription_status === 'active';
+  return s.setup_fee_paid && (s.subscription_status === 'active' || s.subscription_status === 'trialing');
 }
 
 type SubscriptionState = {
