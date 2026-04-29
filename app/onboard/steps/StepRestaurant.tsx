@@ -91,7 +91,7 @@ export default function StepRestaurant({
             onChange={(e) => setName(e.target.value)}
             className="w-full px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-[#0F2B4D]"
             style={{ border: "1px solid #E5E7EB", color: "#1E1E1E", backgroundColor: "#FFFFFF", borderRadius: 4 }}
-            placeholder="Ember & Forge"
+            placeholder="e.g. The Golden Fork"
           />
         </Field>
         <Field label="Phone number">

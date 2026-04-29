@@ -137,7 +137,7 @@ export default function BillingPage() {
             </div>
             <div>
               <p className="text-sm font-semibold" style={{ color: "#1E1E1E" }}>
-                Restoro Professional
+                Savorar Professional
               </p>
               <p className="text-xs" style={{ color: "#4A4A4A" }}>
                 $2,000 setup · $79 / month

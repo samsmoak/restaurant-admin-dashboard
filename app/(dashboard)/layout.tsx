@@ -81,20 +81,25 @@ export default function StudioAppLayout({
     if (!restaurant) void fetchRestaurant();
   }, [hydrated, token, activeRestaurantId, restaurant, fetchRestaurant, router]);
 
+  const paymentGateEnabled =
+    process.env.NEXT_PUBLIC_PAYMENT_GATE_ENABLED !== "false";
+
   // Fetch subscription once when restaurant is confirmed — separate effect so
   // the result (subscription=null on 404) never re-triggers this fetch.
   useEffect(() => {
+    if (!paymentGateEnabled) return;
     if (hydrated && activeRestaurantId) void fetchSubscription();
-  }, [hydrated, activeRestaurantId, fetchSubscription]);
+  }, [hydrated, activeRestaurantId, fetchSubscription, paymentGateEnabled]);
 
   // Redirect to pricing if subscription data says "not active".
   // /billing and /settings are exempt — accessible without an active subscription.
   useEffect(() => {
+    if (!paymentGateEnabled) return;
     const exempt = pathname.startsWith("/billing") || pathname.startsWith("/settings");
     if (!exempt && subscription && !isSubscriptionActive(subscription)) {
       router.push("/billing");
     }
-  }, [subscription, pathname, router]);
+  }, [subscription, pathname, router, paymentGateEnabled]);
 
   const handleSignOut = async () => {
     await signout();
@@ -111,11 +116,11 @@ export default function StudioAppLayout({
   }
   const exemptFromGate = pathname.startsWith("/billing") || pathname.startsWith("/settings");
   // Show loader while subscription is being fetched on gated pages
-  if (!exemptFromGate && subLoading && !subscription) {
+  if (paymentGateEnabled && !exemptFromGate && subLoading && !subscription) {
     return <FullScreenLoader />;
   }
   // Prevent dashboard flash while redirect to /pricing is in flight
-  if (!exemptFromGate && subscription && !isSubscriptionActive(subscription)) {
+  if (paymentGateEnabled && !exemptFromGate && subscription && !isSubscriptionActive(subscription)) {
     return <FullScreenLoader />; // brief blank while router.push("/billing") lands
   }
 
@@ -237,10 +242,10 @@ function SidebarContent({
             className="w-9 h-9 flex items-center justify-center text-sm font-bold"
             style={{ backgroundColor: "#FFFFFF", color: "#0F2B4D" }}
           >
-            R
+            S
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-white truncate">Restoro</p>
+            <p className="text-sm font-semibold text-white truncate">Savorar</p>
             <p
               className="text-xs truncate"
               style={{ color: "rgba(255, 255, 255, 0.6)" }}

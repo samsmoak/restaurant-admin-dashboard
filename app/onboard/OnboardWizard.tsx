@@ -128,7 +128,7 @@ export default function OnboardWizard() {
           className="w-12 h-12 mx-auto mb-3 flex items-center justify-center text-xl font-bold"
           style={{ backgroundColor: "#0F2B4D", color: "#FFFFFF" }}
         >
-          R
+          S
         </div>
         <h1 className="text-3xl font-bold" style={{ color: "#1E1E1E" }}>
           Let&apos;s set up your restaurant
@@ -202,7 +202,7 @@ function InitErrorCard({
           className="w-11 h-11 mx-auto mb-3 flex items-center justify-center text-base font-bold"
           style={{ backgroundColor: "#0F2B4D", color: "#FFFFFF" }}
         >
-          R
+          S
         </div>
         <h2 className="text-lg font-bold" style={{ color: "#1E1E1E" }}>
           Something went wrong

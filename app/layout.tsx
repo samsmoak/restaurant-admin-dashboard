@@ -15,10 +15,10 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Ember & Forge Dashboard",
-    default: "Dashboard | Ember & Forge",
+    template: "%s | Savorar",
+    default: "Dashboard | Savorar",
   },
-  description: "Restaurant management dashboard",
+  description: "Savorar — Restaurant management dashboard",
 };
 
 export default function RootLayout({
